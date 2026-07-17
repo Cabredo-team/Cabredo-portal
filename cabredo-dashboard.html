@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cabredo Portal</title>
+<style>
+  :root{
+    --ks:#C9A227;   --ks-bg:#FBF3DC;   --ks-tx:#7A6318;
+    --an:#4C8058;   --an-bg:#EAF3EC;   --an-tx:#2C4A34;
+    --rf:#7A2E2E;   --rf-bg:#F3E4E4;   --rf-tx:#5C2222;
+    --rd:#C0645A;   --rd-bg:#F8E9E6;   --rd-tx:#8C463D;
+
+    --brand:#13261C;
+    --brand-2:#1C3527;
+
+    --ink:#1D1D1F;
+    --ink-secondary:#6E6E73;
+    --ink-muted:#9A9AA0;
+    --surface:#FFFFFF;
+    --surface-1:#F6F6F4;
+    --border:#E4E4E1;
+    --border-strong:#D2D2CE;
+    --radius-lg:16px;
+    --radius-md:12px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    background:var(--surface-1);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{text-decoration:none;color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  table{border-collapse:collapse;width:100%;}
+  input,select{font-family:inherit;}
+
+  .topbar{
+    background:var(--brand);color:#fff;
+    height:64px;padding:0 28px;
+    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:60;
+  }
+  .brand-lockup{display:flex;flex-direction:column;line-height:1.05;cursor:pointer;}
+  .brand-lockup .b1{font-size:18px;font-weight:700;letter-spacing:0.04em;}
+  .brand-lockup .b2{font-size:9.5px;font-weight:600;letter-spacing:0.28em;color:rgba(255,255,255,0.55);}
+  .tagline{font-size:12.5px;color:rgba(255,255,255,0.55);margin-left:22px;display:none;}
+  @media (min-width:840px){.tagline{display:block;}}
+  .topbar-left{display:flex;align-items:center;}
+  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .tb-icon{
+    width:36px;height:36px;border-radius:50%;position:relative;border:none;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,0.08);transition:background .15s ease;
+  }
+  .tb-icon:hover{background:rgba(255,255,255,0.16);}
+  .tb-icon .badge{
+    position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;border-radius:8px;
+    background:var(--rd);color:#fff;font-size:10px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;padding:0 4px;
+    border:2px solid var(--brand);
+  }
+  .tb-divider{width:1px;height:28px;background:rgba(255,255,255,0.14);margin:0 2px;}
+  .dealer-id{text-align:right;line-height:1.25;}
+  .dealer-id .d-name{font-size:12.5px;font-weight:700;letter-spacing:0.02em;}
+  .dealer-id .d-tier{font-size:11px;color:rgba(255,255,255,0.55);}
+  .tb-avatar{
+    width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.14);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+  }
+  .tb-profile{display:flex;align-items:center;gap:10px;}
+
+  .shell{display:flex;align-items:flex-start;}
+
+  .sidebar{
+    width:230px;flex-shrink:0;background:var(--surface);
+    border-right:1px solid var(--border);
+    min-height:calc(100vh - 64px);
+    padding:18px 12px;display:flex;flex-direction:column;
+    position:sticky;top:64px;
+  }
+  .nav-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;
+    font-size:13.5px;font-weight:500;color:var(--ink-secondary);border:none;background:none;
+    transition:background .12s ease, color .12s ease;width:100%;text-align:left;
+  }
+  .nav-item svg{flex-shrink:0;}
+  .nav-item:hover{background:var(--surface-1);color:var(--ink);}
+  .nav-item.active{background:var(--brand);color:#fff;font-weight:600;}
+  .nav-item .nav-badge{
+    margin-left:auto;background:var(--rd-bg);color:var(--rd-tx);font-size:10.5px;font-weight:700;
+    padding:1px 7px;border-radius:10px;
+  }
+  .nav-item.active .nav-badge{background:rgba(255,255,255,0.22);color:#fff;}
+  .sidebar-spacer{flex:1;}
+  .sidebar-help{border-top:1px solid var(--border);padding-top:14px;margin-top:10px;}
+  .sidebar-help .sh-title{font-size:12.5px;font-weight:700;margin:0 0 6px 12px;}
+  .sidebar-help .sh-line{display:flex;align-items:center;gap:9px;padding:6px 12px;font-size:12px;color:var(--ink-secondary);}
+
+  .main{flex:1;min-width:0;padding:30px 36px 70px;}
+  .page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;gap:20px;}
+  .page-head h1{font-size:25px;font-weight:700;letter-spacing:-0.01em;margin:0 0 4px;}
+  .page-head p{font-size:13.5px;color:var(--ink-secondary);margin:0;}
+  .btn-primary{
+    display:flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border:none;
+    padding:12px 20px;border-radius:10px;font-size:13.5px;font-weight:600;
+    transition:background .15s ease, transform .15s ease;flex-shrink:0;white-space:nowrap;
+  }
+  .btn-primary:hover{background:var(--brand-2);transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .btn-secondary{
+    display:flex;align-items:center;gap:8px;background:var(--surface);color:var(--ink);
+    border:1px solid var(--border-strong);padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:600;
+    transition:background .15s ease;flex-shrink:0;white-space:nowrap;
+  }
+  .btn-secondary:hover{background:var(--surface-1);}
+  .btn-ghost{background:none;border:none;color:var(--ink-secondary);font-size:13px;font-weight:600;padding:8px 0;}
+  .btn-ghost:hover{color:var(--ink);}
+  .btn-danger-ghost{background:none;border:none;color:var(--rf);font-size:12px;font-weight:600;}
+
+  .content-grid{display:grid;grid-template-columns:1fr 296px;gap:28px;align-items:start;}
+  @media (max-width:1080px){.content-grid{grid-template-columns:1fr;}}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;}
+  .section{margin-bottom:28px;}
+  .section:last-child{margin-bottom:0;}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+  .section-title{font-size:15.5px;font-weight:700;letter-spacing:-0.005em;margin:0;}
+  .section-link{font-size:12.5px;color:var(--ink-secondary);font-weight:600;background:none;border:none;padding:0;}
+  .section-link:hover{color:var(--ink);}
+
+  .crumb{font-size:12.5px;color:var(--ink-secondary);font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .crumb .c-sep{color:var(--ink-muted);}
+  .crumb-line{padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+  .crumb-line.ks{background:var(--ks-bg);color:var(--ks-tx);}
+  .crumb-line.an{background:var(--an-bg);color:var(--an-tx);}
+  .crumb-line.rf{background:var(--rf-bg);color:var(--rf-tx);}
+  .crumb-line.rd{background:var(--rd-bg);color:var(--rd-tx);}
+
+  .pinned-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;}
+  .pin-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+    padding:13px 14px;position:relative;transition:border-color .15s ease, transform .15s ease;cursor:pointer;
+  }
+  .pin-card:hover{border-color:var(--border-strong);transform:translateY(-2px);}
+  .pin-accent{position:absolute;top:0;left:0;right:0;height:4px;border-radius:var(--radius-md) var(--radius-md) 0 0;}
+  .pin-accent.ks{background:var(--ks);} .pin-accent.an{background:var(--an);}
+  .pin-accent.rf{background:var(--rf);} .pin-accent.rd{background:var(--rd);}
+  .pin-flag{position:absolute;top:12px;right:12px;background:none;border:none;padding:0;}
+  .pin-name{font-size:13.5px;font-weight:700;margin:8px 0 3px;padding-right:20px;letter-spacing:-0.005em;}
+  .pin-meta{font-size:11.5px;color:var(--ink-secondary);margin:0 0 10px;}
+  .line-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;}
+  .line-tag .swatch{width:7px;height:7px;border-radius:50%;}
+  .line-tag.ks{color:var(--ks-tx);} .line-tag.ks .swatch{background:var(--ks);}
+  .line-tag.an{color:var(--an-tx);} .line-tag.an .swatch{background:var(--an);}
+  .line-tag.rf{color:var(--rf-tx);} .line-tag.rf .swatch{background:var(--rf);}
+  .line-tag.rd{color:var(--rd-tx);} .line-tag.rd .swatch{background:var(--rd);}
+
+  .dtable th{
+    text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;
+    color:var(--ink-muted);padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface-1);
+  }
+  .dtable td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .dtable tbody tr{transition:background .12s ease;cursor:pointer;}
+  .dtable tbody tr:hover{background:var(--surface-1);}
+  .dtable tbody tr:last-child td{border-bottom:none;}
+  .cell-title{font-weight:600;color:var(--ink);}
+  .cell-sub{font-size:11.5px;color:var(--ink-secondary);margin-top:1px;}
+  .cell-price{font-weight:600;white-space:nowrap;}
+  .cell-price .net{color:var(--ink-secondary);font-weight:500;}
+  .status-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;display:inline-block;}
+  .status-pill.progress{background:var(--ks-bg);color:var(--ks-tx);}
+  .status-pill.wait{background:#EAF1FB;color:#2C4A6E;}
+  .status-pill.prod{background:var(--an-bg);color:var(--an-tx);}
+  .status-pill.shipped{background:#EAF1FB;color:#2C4A6E;}
+
+  .catalog-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .cat-tile{border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 12px 11px;position:relative;overflow:hidden;transition:border-color .15s ease, transform .15s ease;background:none;text-align:left;width:100%;}
+  .cat-tile:hover{border-color:var(--border-strong);transform:translateY(-2px);}
+  .cat-tile-accent{width:26px;height:5px;border-radius:3px;margin-bottom:10px;}
+  .cat-tile-accent.ks{background:var(--ks);} .cat-tile-accent.an{background:var(--an);}
+  .cat-tile-accent.rf{background:var(--rf);} .cat-tile-accent.rd{background:var(--rd);}
+  .cat-tile .ct-name{font-size:12.5px;font-weight:700;margin:0 0 2px;}
+  .cat-tile .ct-sub{font-size:10.5px;color:var(--ink-secondary);margin:0;}
+
+  .side-card{padding:16px 16px 14px;margin-bottom:18px;}
+  .side-card h3{font-size:13.5px;font-weight:700;margin:0 0 12px;}
+  .announcement{display:flex;gap:10px;padding-bottom:11px;margin-bottom:11px;border-bottom:1px solid var(--border);}
+  .announcement:last-child{border:none;margin:0;padding:0;}
+  .announcement .a-dot{width:6px;height:6px;border-radius:50%;background:var(--brand);margin-top:6px;flex-shrink:0;}
+  .announcement p{margin:0;font-size:12.5px;line-height:1.45;}
+  .announcement .a-title{font-weight:700;margin-bottom:2px;}
+  .announcement .a-time{font-size:11px;color:var(--ink-muted);margin-top:3px;}
+  .msg{display:flex;gap:9px;align-items:flex-start;padding:8px 0;}
+  .msg .m-avatar{width:28px;height:28px;border-radius:50%;background:var(--surface-1);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:var(--ink-secondary);flex-shrink:0;}
+  .msg .m-body{flex:1;min-width:0;}
+  .msg .m-name{font-size:12.5px;font-weight:700;margin:0;display:flex;align-items:center;gap:6px;}
+  .msg .m-snippet{font-size:11.5px;color:var(--ink-secondary);margin:2px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .unread-dot{width:6px;height:6px;border-radius:50%;background:var(--rf);flex-shrink:0;}
+
+  .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:28px;max-width:480px;}
+  .form-card label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-secondary);margin:0 0 6px;}
+  .form-card input[type=text],.form-card select{
+    width:100%;height:42px;border-radius:9px;border:1px solid var(--border-strong);padding:0 14px;
+    font-size:14px;color:var(--ink);margin-bottom:20px;outline:none;background:var(--surface);
+  }
+  .form-card input[type=text]:focus,.form-card select:focus{border-color:var(--brand);}
+  .form-hint{font-size:12px;color:var(--ink-muted);margin:-14px 0 20px;}
+
+  .line-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;}
+  .line-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;overflow:hidden;text-align:left;transition:border-color .15s ease, transform .15s ease;}
+  .line-card:hover{border-color:var(--border-strong);transform:translateY(-3px);}
+  .line-card .lc-band{height:64px;}
+  .line-card .lc-band.ks{background:var(--ks);} .line-card .lc-band.an{background:var(--an);}
+  .line-card .lc-band.rf{background:var(--rf);} .line-card .lc-band.rd{background:var(--rd);}
+  .line-card .lc-body{padding:18px 20px 20px;}
+  .line-card .lc-name{font-size:17px;font-weight:700;margin:0 0 6px;letter-spacing:-0.01em;}
+  .line-card .lc-desc{font-size:12.5px;color:var(--ink-secondary);line-height:1.5;margin:0 0 14px;min-height:38px;}
+  .line-card .lc-cta{font-size:12.5px;font-weight:700;color:var(--brand);}
+
+  .cat-tabs-wrap{position:sticky;top:64px;z-index:40;background:var(--surface-1);padding:10px 0 12px;margin:0 0 4px;border-bottom:1px solid var(--border);}
+  .cat-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+  .cat-tab{padding:7px 13px;border-radius:20px;border:1px solid var(--border-strong);background:var(--surface);font-size:12px;font-weight:600;color:var(--ink-secondary);}
+  .cat-tab.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .cat-tab-count{font-size:10.5px;opacity:0.65;font-weight:600;}
+  .cat-search{width:100%;max-width:340px;height:36px;border-radius:8px;border:1px solid var(--border-strong);padding:0 12px;font-size:13px;background:var(--surface);}
+  .empty-hint{color:var(--ink-muted);font-size:13px;padding:24px 4px;grid-column:1/-1;}
+  .cab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;padding-top:14px;}
+  .cab-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;text-align:left;transition:border-color .15s ease, transform .15s ease;}
+  .cab-card.available:hover{border-color:var(--border-strong);transform:translateY(-2px);}
+  .cab-card.unavailable{opacity:0.55;cursor:not-allowed;}
+  .cab-thumb{height:56px;display:flex;align-items:center;justify-content:center;padding:4px;}
+  .cab-thumb .cab-icon{opacity:0.9;}
+  .cab-photo{max-width:100%;max-height:100%;object-fit:contain;}
+  .cab-photo-lg{max-width:88%;max-height:88%;object-fit:contain;}
+  .cab-icon-fallback{display:flex;align-items:center;justify-content:center;}
+  .cab-body{padding:8px 10px 10px;}
+  .cab-name{font-size:11.5px;font-weight:700;margin:0 0 3px;line-height:1.25;}
+  .cab-code{font-size:10px;color:var(--ink-muted);font-family:ui-monospace,Menlo,monospace;margin:0 0 6px;}
+  .cab-avail-badge{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:12px;background:var(--surface-1);color:var(--ink-muted);}
+
+  .detail-layout{display:grid;grid-template-columns:300px 1fr;gap:28px;}
+  @media (max-width:960px){.detail-layout{grid-template-columns:1fr;}}
+  .detail-image{height:220px;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;}
+  .detail-panel .dp-name{font-size:20px;font-weight:700;margin:14px 0 4px;letter-spacing:-0.01em;}
+  .detail-panel .dp-code{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--ink-secondary);background:var(--surface-1);display:inline-block;padding:5px 10px;border-radius:7px;margin-bottom:6px;word-break:break-all;}
+  .config-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px 20px;margin-bottom:16px;}
+  .config-card h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);margin:0 0 14px;}
+  .config-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:4px;}
+  .config-field label{display:block;font-size:11.5px;font-weight:700;color:var(--ink-secondary);margin-bottom:5px;}
+  .config-field select,.config-field input[type=number]{width:100%;height:38px;border-radius:8px;border:1px solid var(--border-strong);padding:0 12px;font-size:13px;background:var(--surface);}
+  .field-hint{font-size:11px;color:var(--ink-muted);margin-top:5px;}
+  .check-row{display:flex;align-items:center;gap:9px;padding:7px 0;font-size:13px;}
+  .check-row input{width:16px;height:16px;}
+  .mod-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:4px 20px;}
+  .qty-stepper{display:flex;align-items:center;gap:0;border:1px solid var(--border-strong);border-radius:9px;width:fit-content;}
+  .qty-stepper button{width:34px;height:34px;background:none;border:none;font-size:15px;font-weight:700;color:var(--ink);}
+  .qty-stepper button:hover{background:var(--surface-1);}
+  .qty-stepper span{width:34px;text-align:center;font-size:13px;font-weight:600;}
+  .breakdown{background:var(--surface-1);border-radius:var(--radius-md);padding:16px 18px;margin-top:4px;}
+  .breakdown-line{display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;color:var(--ink-secondary);}
+  .breakdown-line.total{border-top:1px solid var(--border-strong);margin-top:8px;padding-top:10px;font-size:14px;font-weight:700;color:var(--ink);}
+  .breakdown-line.net{font-size:12.5px;color:var(--ink-secondary);padding-top:0;}
+  .dp-price{display:flex;align-items:baseline;gap:10px;margin:16px 0;}
+  .dp-price .list{font-size:24px;font-weight:700;}
+  .dp-price .net{font-size:13px;color:var(--ink-secondary);}
+
+  .qty-mini{display:flex;align-items:center;gap:6px;}
+  .qty-mini button{width:26px;height:26px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);font-weight:700;font-size:13px;}
+  .qty-mini span{min-width:20px;text-align:center;font-size:13px;font-weight:600;}
+  .totals-bar{display:flex;align-items:center;justify-content:flex-end;gap:28px;padding:16px 20px;background:var(--surface-1);border-top:1px solid var(--border);}
+  .totals-bar .t-block{text-align:right;}
+  .totals-bar .t-label{font-size:11px;color:var(--ink-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;}
+  .totals-bar .t-val{font-size:17px;font-weight:700;}
+  .action-row{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;}
+
+  .confirm-wrap{max-width:480px;margin:60px auto;text-align:center;}
+  .confirm-icon{width:64px;height:64px;border-radius:50%;background:var(--an-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+  .confirm-wrap h1{font-size:22px;margin:0 0 8px;}
+  .confirm-wrap p{font-size:14px;color:var(--ink-secondary);margin:0 0 4px;}
+  .confirm-ref{display:inline-block;margin:16px 0 26px;padding:8px 16px;background:var(--surface-1);border-radius:8px;font-family:ui-monospace,Menlo,monospace;font-size:13px;}
+
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);
+    background:var(--brand);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);z-index:100;max-width:320px;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+
+  @media (max-width:840px){
+    .sidebar{display:none;}
+    .main{padding:22px 18px 50px;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="brand-lockup" onclick="nav('dashboard')"><span class="b1">CABREDO</span><span class="b2">PORTAL</span></div>
+      <span class="tagline">Custom cabinetry, crafted for you</span>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-icon" title="Dealer messages" onclick="showToast('Message center — not built in this prototype')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="badge">3</span>
+      </button>
+      <button class="tb-icon" title="Help" onclick="showToast('Reach your Cabredo rep at (717) 445-5200')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+      <div class="tb-divider"></div>
+      <div class="tb-profile">
+        <div class="dealer-id"><div class="d-name">KITCHEN DESIGNS LLC</div><div class="d-tier">Dealer · Platinum</div></div>
+        <div class="tb-avatar">NS</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <div class="sidebar">
+      <ul class="nav-list">
+        <li><button class="nav-item" data-screen="dashboard" onclick="nav('dashboard')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/></svg>Dashboard</button></li>
+        <li><button class="nav-item" data-screen="flow" onclick="startNewProject()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>New project</button></li>
+        <li><button class="nav-item" onclick="showToast('Quotes list — not built in this prototype')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>Quotes</button></li>
+        <li><button class="nav-item" onclick="showToast('Orders list — not built in this prototype')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Orders</button></li>
+        <li><button class="nav-item" onclick="showToast('Price lists — not built in this prototype')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Price lists</button></li>
+        <li><button class="nav-item" onclick="showToast('Full catalog browser — not built in this prototype. Try New project to browse by line.')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>Product catalog</button></li>
+        <li><button class="nav-item" onclick="showToast('Dealer settings — not built in this prototype')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Dealer settings</button></li>
+        <li><button class="nav-item" onclick="showToast('Resources — not built in this prototype')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Resources</button></li>
+        <li><button class="nav-item" onclick="showToast('Message center — not built in this prototype')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Messages<span class="nav-badge">2</span></button></li>
+      </ul>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-help">
+        <p class="sh-title">Need help?</p>
+        <div class="sh-line"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>(717) 445-5200</div>
+        <div class="sh-line"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="m4 4 8 9 8-9"/></svg>support@cabredo.com</div>
+      </div>
+    </div>
+
+    <div class="main" id="mainContent"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/* ================= PRICING DATA (from Allmoxy pricing doc) ================= */
+const NET_MULT = 0.786;
+const LINES = {
+  ks:{label:'Keystone', code:'KS', desc:'Framed construction. Our entry line — reliable and value-priced.', mult:1.00},
+  an:{label:'Anchor', code:'AN', desc:'Framed construction. Our standard line for everyday jobs.', mult:1.08},
+  rf:{label:'Ravir Frameless', code:'RF', desc:'Frameless construction. Premium line, modern profile.', mult:1.35},
+  rd:{label:'Ravir Framed', code:'RD', desc:'Framed construction. Premium line, traditional profile.', mult:1.18}
+};
+const CATEGORIES = ['Base Cabinets','Base Corners','Walls','Wall Corners','Talls','Office','Vanities'];
+
+const DOOR_STYLES = [
+  {id:'standard', label:'Standard', abbr:'STD', fee:15},
+  {id:'colonial', label:'Colonial', abbr:'COL', fee:15},
+  {id:'square18', label:'Square 1/8', abbr:'SQ18', fee:15},
+  {id:'ogee', label:'Ogee', abbr:'OGEE', fee:15},
+  {id:'chamfer45', label:'45° Chamfer', abbr:'CHM45', fee:15},
+  {id:'elite', label:'Elite', abbr:'ELITE', fee:15},
+  {id:'bevel22', label:'22° Bevel', abbr:'BEV22', fee:15},
+  {id:'slabPaint', label:'Slab Door (Paint)', abbr:'SLABP', fee:12},
+  {id:'slabStained', label:'Slab Door (Stained)', abbr:'SLABS', fee:14},
+  {id:'slabBankMatched', label:'Slab Door (Bank Matched)', abbr:'SLABBM', fee:35},
+  {id:'euroPG', label:'Euro Door 3/4" (PG Solid MDF)', abbr:'EUROPG', fee:15},
+  {id:'euroStained', label:'Euro Door 3/4" (Stained)', abbr:'EUROST', fee:35}
+];
+const PANELS = [
+  {id:'flat14', label:'1/4" Flat', abbr:'FLAT', sqftRate:11},
+  {id:'reverseGCove', label:'Reverse G Cove', abbr:'RGCOVE', sqftRate:15},
+  {id:'rpSlant', label:'RP Slant', abbr:'RPSLANT', sqftRate:15},
+  {id:'rpCove', label:'RP Cove', abbr:'RPCOVE', sqftRate:15},
+  {id:'rpRM', label:'RP-RM', abbr:'RPRM', sqftRate:15},
+  {id:'slab34', label:'3/4" Slab', abbr:'SLAB34', sqftRate:15}
+];
+const SPECIES = [
+  {id:'pgMaple', label:'PG Maple', pct:0},
+  {id:'hwMaple', label:'HW Maple', pct:20},
+  {id:'cherry', label:'Cherry', pct:18},
+  {id:'riftWhiteOak', label:'Rift White Oak', pct:40},
+  {id:'whiteOak', label:'White Oak', pct:30},
+  {id:'redOak', label:'Red Oak', pct:10},
+  {id:'riftRedOak', label:'Rift Red Oak', pct:18}
+];
+const FINISH_COLORS = [
+  {id:'white', label:'White'},
+  {id:'linen', label:'Linen'},
+  {id:'graphite', label:'Graphite'},
+  {id:'stormGray', label:'Storm Gray'},
+  {id:'onyx', label:'Onyx'},
+  {id:'espresso', label:'Espresso (Stain)'},
+  {id:'chestnut', label:'Chestnut (Stain)'},
+  {id:'natural', label:'Natural (Stain)'}
+];
+const SHEENS = [
+  {id:'sheen5', label:'5 Sheen', pct:0},
+  {id:'sheen20', label:'20 Sheen', pct:0},
+  {id:'flat', label:'Flat', pct:5}
+];
+const INSERTS = [
+  {id:'none', label:'None', cost:0},
+  {id:'kb', label:'Knife block insert', cost:130},
+  {id:'sd', label:'Spice drawer insert', cost:130},
+  {id:'cti1', label:'Cutlery tray insert 1', cost:130},
+  {id:'cti2', label:'Cutlery tray insert 2', cost:130},
+  {id:'ctikb', label:'Cutlery tray + knife block', cost:130},
+  {id:'drwpcc', label:'Drawer pipe chase', cost:130}
+];
+const TOE_KICK = [
+  {id:'none', label:'Standard', cost:0},
+  {id:'ntn', label:'No toe notch', cost:20},
+  {id:'tkf', label:'Toe kick flush', cost:30},
+  {id:'tks', label:'Toe kick side', cost:45},
+  {id:'tkrmv', label:'Toe kick removed', cost:20}
+];
+const DRAWER_WIDTHS = [6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42];
+const DRAWER_HEIGHTS = [4,5,6,7,8,9,10];
+const DRAWER_PRICES = [
+  [40.73,42.37,47.76,50.12,52.48,54.81,57.15],
+  [41.99,43.82,50.55,52.56,54.56,58.14,59.63],
+  [43.24,46.32,53.31,55.27,57.25,61.27,63.18],
+  [45.55,48.82,55.10,57.44,59.77,63.26,66.73],
+  [47.85,51.32,56.85,59.88,62.89,66.57,70.27],
+  [49.10,52.77,59.64,62.84,66.02,69.91,73.82],
+  [50.36,54.21,61.40,64.75,68.07,72.73,77.37],
+  [52.13,56.22,63.14,66.33,69.52,76.24,78.78],
+  [53.92,59.20,65.94,69.62,73.29,78.34,81.31],
+  [56.96,61.39,68.40,72.25,76.11,81.38,84.56],
+  [59.27,63.89,71.20,74.83,78.45,85.90,89.15],
+  [61.57,66.37,74.00,77.66,81.32,88.54,91.56],
+  [63.88,68.87,76.80,80.62,85.50,92.45,96.25],
+  [66.18,71.30,79.59,84.11,88.61,95.77,98.75],
+  [68.47,73.87,82.40,87.60,92.79,100.16,103.33],
+  [70.78,76.32,85.15,90.54,95.92,104.55,110.43],
+  [73.08,78.87,86.97,93.02,99.05,107.89,112.32],
+  [75.87,81.42,91.30,96.97,102.64,109.58,114.97],
+  [78.20,83.98,94.13,99.04,103.95,114.13,116.13]
+];
+function nearestIdx(arr, val){ let best=0, bd=Infinity; arr.forEach((a,i)=>{ const d=Math.abs(a-val); if(d<bd){bd=d;best=i;} }); return best; }
+function drawerBoxUnitPrice(width, height){
+  const wi = nearestIdx(DRAWER_WIDTHS, width);
+  const hi = nearestIdx(DRAWER_HEIGHTS, height);
+  return DRAWER_PRICES[wi][hi];
+}
+
+const CATALOG = [
+  {id:"B-1D", name:"Base Cabinet (1 Door)", category:"Base Cabinets", widths:[12,15,18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[4.5], dims:{depth:24}},
+  {id:"B-2D", name:"Base Cabinet (2 Door)", category:"Base Cabinets", widths:[24,27,30,33,36,39,42], lines:['ks','an','rf','rd'], doors:2, drawers:[4.5], dims:{depth:24}},
+  {id:"2B", name:"Base Cabinet (2 Door, 2 Drawer)", category:"Base Cabinets", widths:[30,33,36], lines:['ks','an','rf','rd'], doors:2, drawers:[15,15], dims:{depth:24}},
+  {id:"BFH-1D", name:"Base Cabinet Full Height Door (1 Door)", category:"Base Cabinets", widths:[12,15,18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BFH-2D", name:"Base Cabinet Full Height Door (2 Door)", category:"Base Cabinets", widths:[24,27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"2DB", name:"Drawer Base (2 Drawer)", category:"Base Cabinets", widths:[12,15,18,21,24,27,30,33,36,39,42], lines:['ks','an','rf','rd'], doors:0, drawers:[15,15], dims:{depth:24}},
+  {id:"3DB", name:"Drawer Base (3 Drawer)", category:"Base Cabinets", widths:[12,15,18,21,24,27,30,33,36,39,42], lines:['ks','an','rf','rd'], doors:0, drawers:[10,10,10], dims:{depth:24}},
+  {id:"4DB", name:"Drawer Base (4 Drawer)", category:"Base Cabinets", widths:[12,15,18,21,24,27,30,33,36,39,42], lines:['ks','an','rf','rd'], doors:0, drawers:[7.5,7.5,7.5,7.5], dims:{depth:24}},
+  {id:"4DBS", name:"Drawer Base Split Top (4 Drawer)", category:"Base Cabinets", widths:[30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[7.5,7.5,7.5,7.5], dims:{depth:24}},
+  {id:"6DBS", name:"Drawer Base Split Top (6 Drawer)", category:"Base Cabinets", widths:[30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[5,5,5,5,5,5], dims:{depth:24}},
+  {id:"SB-1D", name:"Sink Base (1 Door)", category:"Base Cabinets", widths:[18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"SB-2D", name:"Sink Base (2 Door)", category:"Base Cabinets", widths:[24,27,30,33,36], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"2SB", name:"Sink Base (2 Door + Drawer)", category:"Base Cabinets", widths:[30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:2, drawers:[4.5], dims:{depth:24}},
+  {id:"FSB", name:"Farm Sink Base", category:"Base Cabinets", widths:[33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:2, drawers:[4.5], dims:{depth:24}},
+  {id:"SBFH-1D", name:"Sink Base Full Height (1 Door)", category:"Base Cabinets", widths:[18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"SBFH-2D", name:"Sink Base Full Height (2 Door)", category:"Base Cabinets", widths:[24,27,30,33,36,39,42], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"CB", name:"Appliance Base — Cooktop", category:"Base Cabinets", widths:[30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:2, drawers:[4.5], dims:{depth:24}},
+  {id:"CAB", name:"Appliance Base — Cooktop (Adj. Shelf)", category:"Base Cabinets", widths:[30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"CB3D", name:"Appliance Base — Cooktop (3 Drawer)", category:"Base Cabinets", widths:[30,33,36,39,42], lines:['ks','an','rf','rd'], doors:0, drawers:[10,10,10], dims:{depth:24}},
+  {id:"CAB2D", name:"Appliance Base — Cooktop (2 Drawer)", category:"Base Cabinets", widths:[30,33,36,39,42], lines:['ks','an','rf','rd'], doors:0, drawers:[15,15], dims:{depth:24}},
+  {id:"BOC", name:"Appliance Base — Open Cutout", category:"Base Cabinets", widths:[24,27,30,33,36,39], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:24}},
+  {id:"BMD", name:"Appliance Base — Microwave Drawer", category:"Base Cabinets", widths:[24,27,30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[30], dims:{depth:24}},
+  {id:"BWD", name:"Appliance Base — Warming Drawer", category:"Base Cabinets", widths:[24,27,30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[15,15], dims:{depth:24}},
+  {id:"BWBS-W", name:"Waste Bin Base — Single (Wood)", category:"Base Cabinets", widths:[15,18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWBD-W", name:"Waste Bin Base — Double (Wood)", category:"Base Cabinets", widths:[18,21,24,27], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWBS-M", name:"Waste Bin Base — Single (Metal)", category:"Base Cabinets", widths:[15,18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWBD-M", name:"Waste Bin Base — Double (Metal)", category:"Base Cabinets", widths:[18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWBSFH-W", name:"Waste Bin Base FH — Single (Wood)", category:"Base Cabinets", widths:[15,18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWBDFH-W", name:"Waste Bin Base FH — Double (Wood)", category:"Base Cabinets", widths:[18,21,24,27], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWBSFH-M", name:"Waste Bin Base FH — Single (Metal)", category:"Base Cabinets", widths:[15,18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWBDFH-M", name:"Waste Bin Base FH — Double (Metal)", category:"Base Cabinets", widths:[18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"TB", name:"Tray Base", category:"Base Cabinets", widths:[9,12,15,18], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BPC", name:"Base Pullout Cabinet", category:"Base Cabinets", widths:[9,12,15,18], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"MBC", name:"Mixer Base Cabinet", category:"Base Cabinets", widths:[15,18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWX", name:"Wine Base (X Partition)", category:"Base Cabinets", widths:[18,21,24,27,30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:24}},
+  {id:"BWL", name:"Wine Base (Lattice)", category:"Base Cabinets", widths:[18,21,24,27,30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:24}},
+  {id:"BWC", name:"Wine Base 6\"", category:"Base Cabinets", widths:[6], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:24}},
+  {id:"BWC-12", name:"Wine Base 12\"", category:"Base Cabinets", widths:[12], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:24}},
+  {id:"BDE", name:"Base End Cabinet (Diagonal)", category:"Base Cabinets", widths:[24], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"BAE", name:"Base Angle End Cabinet (L/R)", category:"Base Cabinets", widths:[12], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BAC", name:"Base Angle Corner Cabinet", category:"Base Cabinets", widths:[24], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"BCA", name:"Corner Base 90° (Bi-fold)", category:"Base Corners", widths:[36,39], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BCSS", name:"Corner Base 90° Lazy Susan (2 Shelf)", category:"Base Corners", widths:[36], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BCLS", name:"Corner Base 90° Lazy Susan (Post)", category:"Base Corners", widths:[36], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BCRLS", name:"Corner Base 90° Lazy Susan (Rev., Door-Mount)", category:"Base Corners", widths:[36], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BDCA", name:"Corner Base Diagonal", category:"Base Corners", widths:[33,36,39], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BDCSS", name:"Corner Base Diagonal Lazy Susan (2 Shelf)", category:"Base Corners", widths:[36], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BDCLS", name:"Corner Base Diagonal Lazy Susan (Post)", category:"Base Corners", widths:[36], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BDCS", name:"Corner Base Diagonal (No Shelf)", category:"Base Corners", widths:[36,39], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BDCSFH", name:"Corner Base Diagonal FH (Concealed Apron)", category:"Base Corners", widths:[36,39], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BBC", name:"Blind Corner Base (L/R)", category:"Base Corners", widths:[42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[4.5], dims:{depth:24}},
+  {id:"BBCFH", name:"Blind Corner Base FH (L/R)", category:"Base Corners", widths:[42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BBCSO", name:"Blind Corner Base — Half Moon Swing Out (L/R)", category:"Base Corners", widths:[42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[4.5], dims:{depth:24}},
+  {id:"BBCFHK", name:"Blind Corner Base — Kidney Swing Out (L/R)", category:"Base Corners", widths:[45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BBCPO", name:"Blind Corner Base — Swing Out Baskets (L/R)", category:"Base Corners", widths:[45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"W-1D", name:"Wall Cabinet (1 Door)", category:"Walls", widths:[12,15,18,21,24], heights:[12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"W-2D", name:"Wall Cabinet (2 Door)", category:"Walls", widths:[24,27,30,33,36,39,42,45,48], heights:[12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"W-3D", name:"Wall Cabinet (3 Door)", category:"Walls", widths:[54,57,60,63,66,69,72], heights:[12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:3, drawers:[], dims:{depth:13}},
+  {id:"W-4D", name:"Wall Cabinet (4 Door)", category:"Walls", widths:[54,57,60,63,66,69,72], heights:[12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:4, drawers:[], dims:{depth:13}},
+  {id:"WR", name:"Refrigerator Wall", category:"Walls", widths:[30,33,36,39,42,45,48], heights:[12,15,18,21,24,27], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"WSTK-1D", name:"Stacked Wall (1 Door)", category:"Walls", widths:[12,15,18,21,24], heights:[42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"WSTK-2D", name:"Stacked Wall (2 Door)", category:"Walls", widths:[24,27,30,33,36,39,42,45,48], heights:[42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:4, drawers:[], dims:{depth:13}},
+  {id:"W1D-1D", name:"Wall w/ 1 Drawer (1 Door)", category:"Walls", widths:[15,18,21,24], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:1, drawers:[5], dims:{depth:13}},
+  {id:"W1D-2D", name:"Wall w/ 1 Drawer (2 Door)", category:"Walls", widths:[24,27,30,33,36], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[5], dims:{depth:13}},
+  {id:"W2D-2D", name:"Wall w/ 2 Drawers (2 Door)", category:"Walls", widths:[24,27,30,33,36], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[5,5], dims:{depth:13}},
+  {id:"W2DV-1D", name:"Wall w/ 2 Stacked Drawers (1 Door)", category:"Walls", widths:[15,18,21,24], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:1, drawers:[5,5], dims:{depth:13}},
+  {id:"W2DV-2D", name:"Wall w/ 2 Stacked Drawers (2 Door)", category:"Walls", widths:[24,27,30,33,36], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[5,5], dims:{depth:13}},
+  {id:"W4D-2D", name:"Wall w/ 4 Drawers (2 Door)", category:"Walls", widths:[24,27,30,33,36], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[5,5,5,5], dims:{depth:13}},
+  {id:"WMS", name:"Microwave Wall w/ Shelf", category:"Walls", widths:[27,30], heights:[30,33,36,39,42], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"WMC-W", name:"Microwave Wall (Trim Kit)", category:"Walls", widths:[27,30], heights:[30,33,36,39,42], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:18}},
+  {id:"WMD", name:"Microwave Wall w/ Drawer", category:"Walls", widths:[27,30], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[5], dims:{depth:18}},
+  {id:"WAG-1D", name:"Appliance Wall (1 Door)", category:"Walls", widths:[15,18,21,24], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"WAG-2D", name:"Appliance Wall (2 Door)", category:"Walls", widths:[24,27,30,33,36], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:4, drawers:[], dims:{depth:13}},
+  {id:"WAG18-1D", name:"Appliance Garage 18\" (1 Door)", category:"Walls", widths:[15,18,21,24], heights:[18], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WAG18-2D", name:"Appliance Garage 18\" (2 Door)", category:"Walls", widths:[24,27,30,33,36], heights:[18], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"WCDAG", name:"Corner Appliance Garage", category:"Walls", widths:[24], heights:[18], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WXWR", name:"Wall Wine Cabinet (X Partition)", category:"Walls", widths:[18,21,24,27,30,33,36], heights:[18,21,24,27,30], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:13}},
+  {id:"WXWR-DS", name:"Wall Wine Cabinet (X Partition, Double Stack)", category:"Walls", widths:[18,21,24,27,30,33,36], heights:[36,39,42,45,48], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:13}},
+  {id:"WWC-V", name:"Wall Wine Cabinet (Vertical Rack)", category:"Walls", widths:[6], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:13}},
+  {id:"WLWR", name:"Wall Wine Cabinet (Lattice)", category:"Walls", widths:[15,18,21,24,27,30,33,36], heights:[15,18,21,24,27,30,33,36,39,42], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:13}},
+  {id:"WLWR-2D", name:"Wall Wine Cabinet (Lattice, 2 Door Top)", category:"Walls", widths:[24,27,30,33,36,39,42,45,48], heights:[30,33,36,39,42], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"WPR", name:"Wall Plate Rack", category:"Walls", widths:[24,27,30,33,36,39,42,45,48], heights:[15], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:13}},
+  {id:"WPRD", name:"Wall Plate Rack (2 Door Top)", category:"Walls", widths:[24,27,30,33,36,39,42,45,48], heights:[30,33,36,39,42], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"WDE", name:"End Wall (Diagonal)", category:"Walls", widths:[13], heights:[30,33,36,39,42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:13}},
+  {id:"WAC", name:"End Wall (Angle Corner)", category:"Walls", widths:[13], heights:[30,33,36,39,42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"WDCA-24", name:"Corner Wall Diagonal 24\" (24\"-48\"H)", category:"Wall Corners", widths:[24], heights:[24,27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WDCA-27", name:"Corner Wall Diagonal 27\" (24\"-48\"H)", category:"Wall Corners", widths:[27], heights:[24,27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:16}},
+  {id:"WDCLS-24", name:"Corner Wall Diagonal Lazy Susan 24\"", category:"Wall Corners", widths:[24], heights:[30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WDCLS-27", name:"Corner Wall Diagonal Lazy Susan 27\"", category:"Wall Corners", widths:[27], heights:[30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:16}},
+  {id:"WDCSS-24", name:"Corner Wall Diagonal Lazy Susan (Floor) 24\"", category:"Wall Corners", widths:[24], heights:[30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WDCSS-27", name:"Corner Wall Diagonal Lazy Susan (Floor) 27\"", category:"Wall Corners", widths:[27], heights:[30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:16}},
+  {id:"WDCAG-24", name:"Corner Wall Diagonal Appliance Garage 24\"", category:"Wall Corners", widths:[24], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WDCAG-27", name:"Corner Wall Diagonal Appliance Garage 27\"", category:"Wall Corners", widths:[27], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:16}},
+  {id:"WDCAGLS-24", name:"Corner Wall Diagonal Appl. Garage Lazy Susan 24\"", category:"Wall Corners", widths:[24], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WDCAGLS-27", name:"Corner Wall Diagonal Appl. Garage Lazy Susan 27\"", category:"Wall Corners", widths:[27], heights:[48,51,54,57,60], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:16}},
+  {id:"WCA-24", name:"Corner Wall 90° 24\"", category:"Wall Corners", widths:[24], heights:[24,27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WCA-27", name:"Corner Wall 90° 27\"", category:"Wall Corners", widths:[27], heights:[24,27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WBC-1D", name:"Blind Corner Wall (1 Door, L/R)", category:"Wall Corners", widths:[27,30,33,36], heights:[24,27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:13}},
+  {id:"WBC-2D", name:"Blind Corner Wall (2 Door, L/R)", category:"Wall Corners", widths:[39,42,45,48], heights:[24,27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"TBR-1D", name:"Tall Broom Cabinet (1 Door)", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"TBR-2D", name:"Tall Broom Cabinet (2 Door)", category:"Talls", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TU-1D", name:"Tall Utility Cabinet (1 Door)", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"TU-2D", name:"Tall Utility Cabinet (2 Door)", category:"Talls", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TRO-1D", name:"Tall Rollout Cabinet (1 Door)", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"TRO-2D", name:"Tall Rollout Cabinet (2 Door)", category:"Talls", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TPC", name:"Tall Pantry Pullout Cabinet", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"TUI-1D", name:"Tall Inverted Utility Cabinet (1 Door)", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TUI-2D", name:"Tall Inverted Utility Cabinet (2 Door)", category:"Talls", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:3, drawers:[], dims:{depth:24}},
+  {id:"T1D-1D", name:"Tall 1-Drawer Cabinet (1 Door)", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[30], dims:{depth:24}},
+  {id:"T1D-2D", name:"Tall 1-Drawer Cabinet (2 Door)", category:"Talls", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:3, drawers:[30], dims:{depth:24}},
+  {id:"T2D-1D", name:"Tall 2-Drawer Cabinet (1 Door)", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:1, drawers:[15,15], dims:{depth:24}},
+  {id:"T2D-2D", name:"Tall 2-Drawer Cabinet (2 Door)", category:"Talls", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[15,15], dims:{depth:24}},
+  {id:"T3D-1D", name:"Tall 3-Drawer Cabinet (1 Door)", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:1, drawers:[10,10,10], dims:{depth:24}},
+  {id:"T3D-2D", name:"Tall 3-Drawer Cabinet (2 Door)", category:"Talls", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[10,10,10], dims:{depth:24}},
+  {id:"T4D-1D", name:"Tall 4-Drawer Cabinet (1 Door)", category:"Talls", widths:[12,15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:1, drawers:[7.5,7.5,7.5,7.5], dims:{depth:24}},
+  {id:"T4D-2D", name:"Tall 4-Drawer Cabinet (2 Door)", category:"Talls", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[7.5,7.5,7.5,7.5], dims:{depth:24}},
+  {id:"TSO", name:"Tall Single Oven Cabinet", category:"Talls", widths:[27,30,33], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:4, drawers:[], dims:{depth:24}},
+  {id:"TMO", name:"Tall Microwave & Oven Cabinet", category:"Talls", widths:[27,30,33], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TDO", name:"Tall Double Oven Cabinet", category:"Talls", widths:[27,30,33], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[30], dims:{depth:24}},
+  {id:"TDOW", name:"Tall Double Oven & Warming Drawer", category:"Talls", widths:[27,30,33], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[30], dims:{depth:24}},
+  {id:"TRS", name:"Tall Refrigerator Panel (Single Leg, L/R)", category:"Talls", widths:[36,39,42,45,48], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TR", name:"Tall Refrigerator Panel (Double Leg)", category:"Talls", widths:[36,39,42,45,48], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TDE", name:"Tall End Cabinet (Diagonal)", category:"Talls", widths:[13,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TAC", name:"Tall End Cabinet (Angle Corner)", category:"Talls", widths:[24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"BFC3D", name:"Base Filing Cabinet (3 Drawer)", category:"Office", widths:[18,21,24], heights:[28.5,30], lines:['ks','an','rf','rd'], doors:0, drawers:[4.5,4.5,12], dims:{depth:24}},
+  {id:"BFCS2D", name:"Base Filing Cabinet (2 Drawer, Matching Front)", category:"Office", widths:[18,21,24], heights:[28.5,30], lines:['ks','an','rf','rd'], doors:0, drawers:[4.5,12], dims:{depth:24}},
+  {id:"BFCD2D", name:"Base Filing Cabinet (2 Drawer, Equal Height)", category:"Office", widths:[18,21,24,27,30,33,36,39,42], heights:[30], lines:['ks','an','rf','rd'], doors:0, drawers:[15,15], dims:{depth:24}},
+  {id:"PD", name:"Pencil Drawer", category:"Office", widths:[18,21,24,27,30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[5.5], dims:{depth:24}},
+  {id:"2PD", name:"Pencil Drawer (Double)", category:"Office", widths:[30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:0, drawers:[5.5,5.5], dims:{depth:24}},
+  {id:"KB", name:"Keyboard Drawer", category:"Office", widths:[18,21,24,27,30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[5.5], dims:{depth:24}},
+  {id:"ENDPNL", name:"Desk End Panel (Straight)", category:"Office", widths:[24], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{height:29.25,depth:24}, accessory:true},
+  {id:"DSKEP-L", name:"Desk End Panel (Slant)", category:"Office", widths:[24], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{height:29.25,depth:24}, accessory:true},
+  {id:"DSKEP-A", name:"Desk End Panel (Arched)", category:"Office", widths:[24], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{height:29.25,depth:24}, accessory:true},
+  {id:"WLF", name:"Wall Letter File Cabinet", category:"Office", widths:[24,27,30,33,36,39,42,45,48], heights:[12], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:13}},
+  {id:"WLFD", name:"Wall Letter File Cabinet (Doors)", category:"Office", widths:[24,27,30,33,36,39,42,45,48], heights:[30,33,36,39,42], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:13}},
+  {id:"OBC", name:"Open Base Cabinet", category:"Office", widths:[12,15,18,21,24,27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:24}},
+  {id:"OBCD", name:"Open Base Cabinet (1 Drawer)", category:"Office", widths:[12,15,18,21,24,27,30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[30], dims:{depth:24}},
+  {id:"BWS-1D", name:"Window Seat Base w/ Door (1 Door)", category:"Office", widths:[18,21,24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"BWS-2D", name:"Window Seat Base w/ Door (2 Door)", category:"Office", widths:[27,30,33,36,39,42,45,48], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"BWSD-1DR", name:"Window Seat Base w/ Drawer (1 Drawer)", category:"Office", widths:[18,21,24,27,30,33,36], lines:['ks','an','rf','rd'], doors:0, drawers:[30], dims:{depth:24}},
+  {id:"BWSD-2DR", name:"Window Seat Base w/ Drawer (2 Drawer)", category:"Office", widths:[39,42,45,48], lines:['ks','an','rf','rd'], doors:0, drawers:[15,15], dims:{depth:24}},
+  {id:"OWC", name:"Open Wall Cabinet", category:"Office", widths:[12,15,18,21,24,27,30,33,36,39,42,45,48], heights:[12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:13}},
+  {id:"TBC", name:"Tall Bookcase Cabinet (Open)", category:"Office", widths:[15,18,21,24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:0, drawers:[], dims:{depth:24}},
+  {id:"TBCD-1D", name:"Tall Bookcase Cabinet (1 Door)", category:"Office", widths:[15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:24}},
+  {id:"TBCD-2D", name:"Tall Bookcase Cabinet (2 Door)", category:"Office", widths:[24,27,30,33,36,39,42], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:24}},
+  {id:"TBC2DB", name:"Tall Bookcase Cabinet (2 Drawer Base)", category:"Office", widths:[15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:0, drawers:[15,15], dims:{depth:24}},
+  {id:"TBC3DB", name:"Tall Bookcase Cabinet (3 Drawer Base)", category:"Office", widths:[15,18,21,24], heights:[84,87,90,93,96], lines:['ks','an','rf','rd'], doors:0, drawers:[10,10,10], dims:{depth:24}},
+  {id:"V3D", name:"Vanity Drawer Base (3 Drawer)", category:"Vanities", widths:[12,15,18,21,24], heights:[34.5], lines:['ks','an','rf','rd'], doors:0, drawers:[10,10,10], dims:{depth:21}},
+  {id:"V4D", name:"Vanity Drawer Base (4 Drawer)", category:"Vanities", widths:[12,15,18,21,24], heights:[34.5], lines:['ks','an','rf','rd'], doors:0, drawers:[7.5,7.5,7.5,7.5], dims:{depth:21}},
+  {id:"VB", name:"Vanity Base (1 Door, 1 Drawer)", category:"Vanities", widths:[12,15,18,21,24], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[4.5], dims:{depth:21}},
+  {id:"VBF-1D", name:"Vanity Base Full Height Door (1 Door)", category:"Vanities", widths:[9,12,15,18,21,24], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:21}},
+  {id:"VBF-2D", name:"Vanity Base Full Height Door (2 Door)", category:"Vanities", widths:[24,27,30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:21}},
+  {id:"VBS", name:"Vanity Sink Base (Drawer + 2 Door)", category:"Vanities", widths:[36,39,42,45,48], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[4.5], dims:{depth:21}},
+  {id:"VC3D", name:"Vanity Combo (3 Drawer Center)", category:"Vanities", widths:[60], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VC3DL-1D", name:"Vanity Combo Left Drawers (1 Door)", category:"Vanities", widths:[30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VC3DL-2D", name:"Vanity Combo Left Drawers (2 Door)", category:"Vanities", widths:[36,39,42,45,48], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VC3DR-1D", name:"Vanity Combo Right Drawers (1 Door)", category:"Vanities", widths:[30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VC3DR-2D", name:"Vanity Combo Right Drawers (2 Door)", category:"Vanities", widths:[36,39,42,45,48], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VC6D", name:"Vanity Combo (6 Drawer + Center Door)", category:"Vanities", widths:[48,51,54,57,60], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[5,5,5,5,5,5], dims:{depth:21}},
+  {id:"VCFD3DC", name:"Vanity Combo Full Height (3 Drawer Center)", category:"Vanities", widths:[60], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VCFD3DL-1D", name:"Vanity Combo FH Left Drawers (1 Door)", category:"Vanities", widths:[30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VCFD3DL-2D", name:"Vanity Combo FH Left Drawers (2 Door)", category:"Vanities", widths:[36,39,42,45,48], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VCFD3DR-1D", name:"Vanity Combo FH Right Drawers (1 Door)", category:"Vanities", widths:[30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VCFD3DR-2D", name:"Vanity Combo FH Right Drawers (2 Door)", category:"Vanities", widths:[36,39,42,45,48], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[10,10,10], dims:{depth:21}},
+  {id:"VCFD6D", name:"Vanity Combo FH (6 Drawer + Center Door)", category:"Vanities", widths:[60], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[5,5,5,5,5,5], dims:{depth:21}},
+  {id:"VCL-1D", name:"Vanity Corner-Style Left (1 Door)", category:"Vanities", widths:[24,27,30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[15,15], dims:{depth:21}},
+  {id:"VCR-1D", name:"Vanity Corner-Style Right (1 Door)", category:"Vanities", widths:[24,27,30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:1, drawers:[15,15], dims:{depth:21}},
+  {id:"VCL-2D", name:"Vanity Corner-Style Left (2 Door)", category:"Vanities", widths:[42,45,48], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[15,15], dims:{depth:21}},
+  {id:"VCR-2D", name:"Vanity Corner-Style Right (2 Door)", category:"Vanities", widths:[42,45,48], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[15,15], dims:{depth:21}},
+  {id:"VS", name:"Vanity Sink Base (2 Door)", category:"Vanities", widths:[24,27,30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:21}},
+  {id:"VSRV", name:"Vanity Sink Base (2 Door + Bottom Drawer)", category:"Vanities", widths:[24,27,30,33,36], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[4.5], dims:{depth:21}},
+  {id:"VSX", name:"Vanity Sink Base (2 Door, Extended)", category:"Vanities", widths:[30,33,36,39,42], heights:[34.5], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:21}},
+  {id:"WHV2D", name:"Vanity Hutch (2 Drawer)", category:"Vanities", widths:[21,24,27,30,33,36], heights:[24], lines:['ks','an','rf','rd'], doors:0, drawers:[15,15], dims:{depth:21}},
+  {id:"WHV", name:"Vanity Hutch (2 Door)", category:"Vanities", widths:[24,27,30,33,36], heights:[24], lines:['ks','an','rf','rd'], doors:2, drawers:[], dims:{depth:21}},
+  {id:"VW", name:"Vanity Wall Cabinet", category:"Vanities", widths:[12,15,18,21,24], heights:[24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:21}},
+  {id:"WMC-V", name:"Vanity Medicine Cabinet", category:"Vanities", widths:[24], heights:[24], lines:['ks','an','rf','rd'], doors:1, drawers:[], dims:{depth:8}},
+];
+const CATEGORY_DIMS = {
+  'Base Cabinets':{height:34.5, depth:24},
+  'Base Corners':{height:34.5, depth:24},
+  'Walls':{depth:13},
+  'Wall Corners':{depth:13},
+  'Talls':{depth:24},
+  'Office':{height:30, depth:24},
+  'Vanities':{height:34.5, depth:21}
+};
+
+function cab(id){ return CATALOG.find(c=>c.id===id); }
+function availableFor(cabId, line){ const c=cab(cabId); return c.lines.includes(line); }
+/* Controls what shows up when browsing the catalog for a NEW project. Cabinet
+   defs stay in CATALOG (so cab() lookups for already-placed orders still resolve),
+   but under Vanities we only surface items actually labeled "Combo" going forward. */
+function isBrowsable(c){
+  if(c.category==='Vanities') return /combo/i.test(c.name);
+  return true;
+}
+
+/* ================= CABINET ICON GENERATOR ================= */
+/* Produces a distinct schematic front-view icon per cabinet based on its
+   actual door count, drawer count, shape family (corner/panel/open), and
+   aspect ratio — so every catalog item gets its own picture with no external
+   image files needed. Returns inner SVG markup for a 0 0 24 24 viewBox. */
+function cabShapeInner(c, dotFill){
+  const isCorner = c.category==='Base Corners' || c.category==='Wall Corners' || /Corner|Diagonal|Angle/i.test(c.name);
+  const isPanel = !!c.accessory;
+  const isOpen = !isPanel && (c.doors||0)===0 && (c.drawers?c.drawers.length:0)===0;
+  const heightRef = c.heights ? c.heights[Math.floor(c.heights.length/2)] : ((c.dims&&c.dims.height) || (CATEGORY_DIMS[c.category]&&CATEGORY_DIMS[c.category].height) || 30);
+  const widthRef = c.widths[Math.floor(c.widths.length/2)] || 24;
+  const ratio = heightRef/widthRef;
+  let bx=3, by=4, bw=18, bh=16;
+  if(ratio>1.6){ bx=7.5; by=1.5; bw=9; bh=21; }
+  else if(ratio<0.55){ bx=2; by=7; bw=20; bh=10; }
+
+  if(isPanel){
+    return `<path d="M ${bx+bw*0.32} ${by} L ${bx+bw} ${by} L ${bx+bw*0.68} ${by+bh} L ${bx} ${by+bh} Z"/>`;
+  }
+  if(isCorner){
+    const mx=bx+bw*0.55, my=by+bh*0.5;
+    return `<path d="M ${bx} ${by+bh} L ${bx} ${my} L ${mx} ${by} L ${bx+bw} ${by} L ${bx+bw} ${by+bh} Z"/>`+
+           `<line x1="${mx}" y1="${by+bh*0.12}" x2="${mx}" y2="${by+bh}"/>`+
+           `<circle cx="${mx-1.6}" cy="${my+bh*0.18}" r="0.7" fill="${dotFill}"/>`;
+  }
+
+  let out = `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="1.2"/>`;
+  const nDrawers = c.drawers ? c.drawers.length : 0;
+  const nDoors = c.doors||0;
+  let y = by;
+  if(nDrawers>0){
+    const drawerFrac = nDoors>0 ? Math.min(0.55, 0.14*nDrawers+0.1) : 1;
+    const totalDrawerH = bh*drawerFrac;
+    const each = totalDrawerH/nDrawers;
+    for(let i=0;i<nDrawers;i++){
+      out += `<rect x="${bx+0.7}" y="${y+0.5}" width="${bw-1.4}" height="${Math.max(each-1,1.2)}" rx="0.4"/>`;
+      out += `<line x1="${bx+bw*0.38}" y1="${y+each/2}" x2="${bx+bw*0.62}" y2="${y+each/2}"/>`;
+      y += each;
+    }
+  }
+  const doorH = (by+bh)-y;
+  if(nDoors>0 && doorH>1.5){
+    if(nDoors===1){
+      out += `<rect x="${bx+0.7}" y="${y+0.5}" width="${bw-1.4}" height="${doorH-1}" rx="0.4"/>`;
+      out += `<circle cx="${bx+bw-2.1}" cy="${y+doorH/2}" r="0.7" fill="${dotFill}"/>`;
+    } else {
+      const cols = Math.min(nDoors,4);
+      const dw = (bw-1.4)/cols;
+      for(let i=0;i<cols;i++){
+        const dx = bx+0.7+i*dw;
+        out += `<rect x="${dx}" y="${y+0.5}" width="${dw-0.6}" height="${doorH-1}" rx="0.4"/>`;
+        const knobX = (i%2===0)? dx+dw-1.3 : dx+1.0;
+        out += `<circle cx="${knobX}" cy="${y+doorH/2}" r="0.6" fill="${dotFill}"/>`;
+      }
+    }
+  } else if(isOpen){
+    const shelves = 2;
+    for(let i=1;i<=shelves;i++){
+      const sy = by + bh*(i/(shelves+1));
+      out += `<line x1="${bx+0.9}" y1="${sy}" x2="${bx+bw-0.9}" y2="${sy}"/>`;
+    }
+  }
+  return out;
+}
+function cabIconSVG(c, color, size){
+  return `<svg class="cab-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.4">${cabShapeInner(c,color)}</svg>`;
+}
+/* Real catalog photo (extracted from the Ravir PDFs) with the schematic SVG as a fallback
+   for the rare item that has no photo on file. */
+function iconFallbackEl(id, color, size){
+  const c = cab(id);
+  const div = document.createElement('div');
+  div.className = 'cab-icon-fallback';
+  div.style.width = size+'px'; div.style.height = size+'px';
+  div.innerHTML = cabIconSVG(c, color, size);
+  return div;
+}
+function cabPhotoHTML(c, color, size, extraClass){
+  return `<img src="images/${encodeURIComponent(c.id)}.png" alt="${c.name}" class="cab-photo ${extraClass||''}" loading="lazy" onerror="this.replaceWith(iconFallbackEl('${c.id}','${color}',${size}))">`;
+}
+
+/* ================= PRICING ENGINE ================= */
+function doorStyleObj(id){ return DOOR_STYLES.find(d=>d.id===id); }
+function panelObj(id){ return PANELS.find(p=>p.id===id); }
+function speciesObj(id){ return SPECIES.find(s=>s.id===id); }
+function sheenObj(id){ return SHEENS.find(s=>s.id===id); }
+function finishObj(id){ return FINISH_COLORS.find(f=>f.id===id); }
+function insertObj(id){ return INSERTS.find(i=>i.id===id); }
+function toeKickObj(id){ return TOE_KICK.find(t=>t.id===id); }
+
+function doorHingeCount(heightIn){ return heightIn<=36 ? 2 : 3+Math.floor((heightIn-36)/18); }
+function boxSqFt(w,h,d){ return (2*(h*d) + (w*d) + (w*h) + (w*d))/144; }
+function faceSqFt(w,h){ return (w*h)/144; }
+
+function itemDims(item){
+  const c = cab(item.cabId);
+  const catDims = CATEGORY_DIMS[c.category] || {};
+  const override = c.dims || {};
+  const height = item.height || override.height || catDims.height || 30;
+  const depth = item.depth || override.depth || catDims.depth || 24;
+  return {width:item.width, height, depth};
+}
+
+function defaultItemConfig(cabId, line){
+  const c = cab(cabId);
+  const wMid = Math.round(((c.widths[0]+c.widths[c.widths.length-1])/2)*16)/16;
+  return {
+    cabId, width: wMid,
+    height: c.heights ? c.heights[Math.floor(c.heights.length/2)] : null,
+    depth: null,
+    doorStyle:'standard', panel:'flat14', species:'pgMaple', sheen:'sheen5', finish:'white',
+    drawerBoxMaterial:'poplar',
+    mods:{ finishedLeft:false, finishedRight:false, applianceSide:false, toeKick:'none',
+           rolloutQty:0, insert:'none', drawerLogo:'none', customModPct:0, customModDesc:'' },
+    qty:1
+  };
+}
+
+/* Returns {breakdown:[{label,amount}], listUnit, netUnit} for ONE unit (qty=1) */
+function priceBreakdown(item, line){
+  const c = cab(item.cabId);
+  const dims = itemDims(item);
+  const fSqFt = faceSqFt(dims.width, dims.height);
+  const bSqFt = boxSqFt(dims.width, dims.height, dims.depth);
+  const ds = doorStyleObj(item.doorStyle);
+  const pn = panelObj(item.panel);
+  const sp = speciesObj(item.species);
+  const sh = sheenObj(item.sheen);
+  const lineMult = LINES[line].mult;
+  const rows = [];
+  let subtotal = 0;
+  function add(label, amount){ if(amount){ rows.push({label, amount}); subtotal += amount; } }
+
+  if(c.accessory){
+    add('Door style / frame bead design fee', ds.fee);
+    add('Panel profile ('+fSqFt.toFixed(2)+' sq ft)', pn.sqftRate*fSqFt);
+    add('Finishing ($8/sq ft)', 8*fSqFt);
+    add('Labor & handling', 45);
+  } else {
+    add('Box material ('+bSqFt.toFixed(2)+' sq ft @ $2.15)', bSqFt*2.15);
+    const isBase = c.category==='Base Cabinets' || c.category==='Base Corners' || c.category==='Vanities' || c.category==='Office';
+    const isWall = c.category==='Walls' || c.category==='Wall Corners';
+    const isTall = c.category==='Talls';
+    if(isBase) add('Base assembly labor', 66);
+    if(isWall) add('Wall assembly labor', 63);
+    if(isTall) add('Tall assembly labor', dims.height>96 ? 230 : 155);
+
+    const doorDrawerCount = c.doors + c.drawers.length;
+    add('Door style design fee ('+doorDrawerCount+' × $'+ds.fee+')', ds.fee*doorDrawerCount);
+    add('Panel profile ('+fSqFt.toFixed(2)+' sq ft @ $'+pn.sqftRate+')', pn.sqftRate*fSqFt);
+
+    const finishRate = isTall ? 17.75 : 15.10;
+    add((isTall?'Tall':isWall?'Wall':'Base')+' finishing ('+fSqFt.toFixed(2)+' sq ft @ $'+finishRate+')', finishRate*fSqFt);
+
+    if(c.doors>0){
+      const hinges = doorHingeCount(dims.height);
+      add('Door hardware ('+c.doors+' door(s), '+hinges+' hinges ea. @ $24/door)', 24*c.doors);
+    }
+    if(c.drawers.length>0){
+      add('Drawer hardware ('+c.drawers.length+' × $56)', 56*c.drawers.length);
+      let drawerBoxTotal = 0;
+      c.drawers.forEach(hIn => { drawerBoxTotal += drawerBoxUnitPrice(dims.width, hIn); });
+      if(item.drawerBoxMaterial==='plywood') drawerBoxTotal *= 0.95;
+      add('Drawer box'+(c.drawers.length>1?'es':'')+' ('+item.drawerBoxMaterial+')', drawerBoxTotal);
+    }
+    if(isBase) add('Cabinet handling', 20);
+    if(isWall) add('Cabinet handling', 20.20);
+    if(isTall) add('Cabinet handling', 20.20);
+    if(isBase) add('Cabinet packaging', 13);
+    if(isWall) add('Cabinet packaging', 18);
+    if(isTall) add('Cabinet packaging', 25);
+  }
+
+  add('Product line adjustment (×'+lineMult.toFixed(2)+')', subtotal*(lineMult-1));
+  add('Wood species — '+sp.label+' (+'+sp.pct+'%)', subtotal*(sp.pct/100));
+  add('Sheen — '+sh.label+(sh.pct? ' (+'+sh.pct+'%)':''), subtotal*(sh.pct/100));
+
+  const m = item.mods;
+  if(m.finishedLeft || m.finishedRight){
+    const sideSqFt = (dims.height*dims.depth)/144;
+    const sides = (m.finishedLeft?1:0)+(m.finishedRight?1:0);
+    add('Finished side ×'+sides+' ('+sideSqFt.toFixed(2)+' sq ft ea.)', sides*(14 + sideSqFt*3.36 + sideSqFt*6.50));
+  }
+  if(m.applianceSide) add('Appliance side', 65);
+  if(m.toeKick && m.toeKick!=='none'){ const tk=toeKickObj(m.toeKick); add(tk.label, tk.cost); }
+  if(m.rolloutQty>0){
+    const rolloutUnit = drawerBoxUnitPrice(dims.width, 4) * 2;
+    add('Roll-outs ×'+m.rolloutQty, rolloutUnit*m.rolloutQty);
+  }
+  if(m.insert && m.insert!=='none'){ const ins=insertObj(m.insert); add(ins.label, ins.cost); }
+  if(m.drawerLogo==='top') add('Drawer box logo (top drawer)', 4);
+  if(m.drawerLogo==='all' && c.drawers.length>0) add('Drawer box logo (all '+c.drawers.length+' drawers)', 4*c.drawers.length);
+  if(m.customModPct>0) add('Custom modification — '+(m.customModDesc||'unspecified')+' (+'+m.customModPct+'%)', subtotal*(m.customModPct/100));
+
+  const listUnit = subtotal;
+  const netUnit = listUnit*NET_MULT;
+  return {breakdown:rows, listUnit, netUnit};
+}
+function priceFor(cabId, line, width){
+  const c = cab(cabId);
+  if(!c.lines.includes(line)) return null;
+  const item = defaultItemConfig(cabId, line);
+  item.width = width;
+  const pb = priceBreakdown(item, line);
+  return {list:pb.listUnit, net:pb.netUnit};
+}
+function codeWidthToken(n){
+  const whole = Math.floor(n);
+  let sixteenths = Math.round((n-whole)*16);
+  let w = whole;
+  if(sixteenths===16){ w+=1; sixteenths=0; }
+  return sixteenths===0 ? String(w) : (w+'-'+sixteenths+'16');
+}
+function codeFor(item, line){
+  const ds=doorStyleObj(item.doorStyle), pn=panelObj(item.panel), fn=finishObj(item.finish);
+  return LINES[line].code+'-'+item.cabId+codeWidthToken(item.width)+(item.height?('x'+item.height):'')+'-'+ds.abbr+'-'+pn.abbr+'-'+fn.label.toUpperCase().replace(/[^A-Z]/g,'');
+}
+function computeTotals(items, line){
+  let list=0,net=0,qty=0;
+  items.forEach(it=>{ const pb=priceBreakdown(it,line); list+=pb.listUnit*it.qty; net+=pb.netUnit*it.qty; qty+=it.qty; });
+  return {list,net,qty};
+}
+function fmt(n){ return '$'+Math.round(n).toLocaleString('en-US'); }
+/* Formats a decimal inch value to the nearest 1/16" as a mixed-fraction string, e.g. 23.9375 -> 23 15/16 */
+function fmtWidth(n){
+  if(n==null) return '';
+  const whole = Math.floor(n);
+  let sixteenths = Math.round((n-whole)*16);
+  let w = whole;
+  if(sixteenths===16){ w+=1; sixteenths=0; }
+  if(sixteenths===0) return w+'"';
+  let num=sixteenths, den=16;
+  while(num%2===0){ num/=2; den/=2; }
+  return w+' '+num+'/'+den+'"';
+}
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(window._toastTimer); window._toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ================= STATE ================= */
+function itemFrom(cabId, line, overrides){ return Object.assign(defaultItemConfig(cabId, line), overrides||{}); }
+const EXISTING = {
+  'Whitmore Residence':{room:'Kitchen', line:'ks', items:[
+    itemFrom('B-2D','ks',{width:24, qty:4}),
+    itemFrom('W-2D','ks',{width:30, height:30, qty:3}),
+    itemFrom('SB-2D','ks',{width:33, qty:1}),
+    itemFrom('TU-2D','ks',{width:24, height:84, qty:1}),
+    itemFrom('VB','ks',{width:24, qty:1}),
+    itemFrom('BWC-12','ks',{width:12, qty:1})
+  ], status:null},
+  'Miller Bath Remodel':{room:'Bathroom', line:'rd', items:[
+    itemFrom('VBF-2D','rd',{width:36, finish:'linen', qty:1}),
+    itemFrom('VB','rd',{width:24, finish:'linen', qty:1}),
+    itemFrom('W-1D','rd',{width:18, height:30, finish:'linen', qty:1})
+  ], status:null},
+  'Cedar Ridge Townhomes':{room:'Unit 4 Kitchen', line:'an', items:[
+    itemFrom('B-2D','an',{width:24, finish:'linen', qty:6}),
+    itemFrom('W-2D','an',{width:30, height:30, finish:'linen', qty:6}),
+    itemFrom('SB-2D','an',{width:33, finish:'linen', qty:2}),
+    itemFrom('TU-2D','an',{width:30, height:84, finish:'linen', qty:2}),
+    itemFrom('B-2D','an',{width:24, finish:'linen', qty:1})
+  ], status:null},
+  'Harbor View Estate':{room:'Kitchen', line:'rf', items:[
+    itemFrom('B-2D','rf',{width:27, finish:'graphite', qty:8}),
+    itemFrom('W-2D','rf',{width:33, height:30, finish:'graphite', qty:6}),
+    itemFrom('SB-2D','rf',{width:36, finish:'graphite', qty:2}),
+    itemFrom('B-2D','rf',{width:30, finish:'graphite', qty:1})
+  ], status:'Awaiting response'},
+  'Dawson Family — Kitchen & Pantry':{room:'Kitchen & Pantry', line:'ks', items:[
+    itemFrom('B-2D','ks',{width:24, qty:3}),
+    itemFrom('W-2D','ks',{width:27, height:30, qty:4}),
+    itemFrom('TU-2D','ks',{width:30, height:84, qty:1}),
+    itemFrom('VB','ks',{width:24, qty:1})
+  ], status:'Awaiting response'},
+  'Cedar Ridge, Unit 2':{room:'Kitchen', line:'an', items:[
+    itemFrom('B-2D','an',{width:24, finish:'linen', qty:9}),
+    itemFrom('W-2D','an',{width:30, height:30, finish:'linen', qty:7}),
+    itemFrom('SB-2D','an',{width:33, finish:'linen', qty:2})
+  ], status:'In production'},
+  'Lakeview Condo Vanity':{room:'Bathroom', line:'rd', items:[
+    itemFrom('VBF-2D','rd',{width:30, finish:'graphite', qty:1}),
+    itemFrom('VB','rd',{width:24, finish:'graphite', qty:1})
+  ], status:'Shipped'}
+};
+
+let state = {
+  screen:'dashboard',
+  project:null,
+  quoteItems:[],
+  activeCategory:CATEGORIES[0],
+  categoryFilter:'',
+  detailItem:null,
+  newProjectDraft:{name:'', roomType:'Kitchen'},
+  readOnly:false,
+  submitMode:null
+};
+
+function breadcrumb(){
+  if(!state.project) return '';
+  const lineChip = state.project.line ? '<span class="c-sep">›</span><span class="crumb-line '+state.project.line+'">'+LINES[state.project.line].label+'</span>' : '';
+  return '<div class="crumb">'+state.project.name+'<span class="c-sep">›</span>'+state.project.room+lineChip+'</div>';
+}
+function pageHead(title, subtitle, rightHtml){
+  return '<div class="page-head"><div><h1>'+title+'</h1><p>'+subtitle+'</p></div>'+(rightHtml||'')+'</div>';
+}
+
+/* ================= NAVIGATION ================= */
+function nav(screen, params){
+  state.screen = screen;
+  if(params) Object.assign(state, params);
+  render();
+  window.scrollTo(0,0);
+}
+function groupOf(screen){ return screen==='dashboard' ? 'dashboard' : 'flow'; }
+function render(){
+  document.querySelectorAll('.nav-item[data-screen]').forEach(el=>{
+    el.classList.toggle('active', el.dataset.screen===groupOf(state.screen));
+  });
+  const main = document.getElementById('mainContent');
+  const map = {
+    dashboard: renderDashboard, newProject: renderNewProject, selectLine: renderSelectLine,
+    category: renderCategory, cabinetDetail: renderCabinetDetail, quoteBuilder: renderQuoteBuilder,
+    quoteReview: renderQuoteReview, submitted: renderSubmitted
+  };
+  main.innerHTML = map[state.screen]();
+}
+function startNewProject(){
+  state.newProjectDraft = {name:'', roomType:'Kitchen'};
+  state.project = null; state.quoteItems = []; state.readOnly=false;
+  nav('newProject');
+}
+function loadProject(name){
+  const p = EXISTING[name];
+  state.project = {name, room:p.room, line:p.line};
+  state.quoteItems = p.items.map(i=>JSON.parse(JSON.stringify(i)));
+  state.readOnly = false;
+  nav('quoteBuilder');
+}
+function viewReadOnly(name){
+  const p = EXISTING[name];
+  state.project = {name, room:p.room, line:p.line};
+  state.quoteItems = p.items.map(i=>JSON.parse(JSON.stringify(i)));
+  state.readOnly = true;
+  state.reviewStatus = p.status;
+  nav('quoteReview');
+}
+
+/* ================= Screen: Dashboard ================= */
+function renderDashboard(){
+  return `
+  ${pageHead('Dashboard','Welcome back, Nelson. Here\'s what\'s happening with your projects.','<button class="btn-primary" onclick="startNewProject()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>New project</button>')}
+
+  <div class="content-grid">
+    <div class="main-col">
+
+      <div class="section">
+        <div class="section-head"><h3 class="section-title">Pinned projects</h3><button class="section-link" onclick="showToast('Pin management — not built in this prototype')">Manage pins</button></div>
+        <div class="pinned-row">
+          ${pinCard('Whitmore Residence','Kitchen · Island · Pantry','ks')}
+          ${pinCard('Cedar Ridge Townhomes','12 units · Kitchens','an')}
+          ${pinCard('Harbor View Estate','Kitchen · Bath · Laundry','rf')}
+          ${pinCard('Miller Bath Remodel','Bathroom · Vanity','rd')}
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3 class="section-title">Continue working</h3><button class="section-link" onclick="showToast('Full list — not built in this prototype')">View all</button></div>
+        <div class="card"><table class="dtable">
+          <thead><tr><th>Project</th><th>Product line</th><th>Last edited</th><th>Running total</th><th>Status</th></tr></thead>
+          <tbody>
+            ${continueRow('Whitmore Residence','Kitchen','ks','2 hours ago')}
+            ${continueRow('Miller Bath Remodel','Bathroom','rd','Yesterday')}
+            ${continueRow('Cedar Ridge Townhomes','Unit 4 Kitchen','an','3 days ago')}
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3 class="section-title">Submitted quotes</h3><button class="section-link" onclick="showToast('Full list — not built in this prototype')">View all</button></div>
+        <div class="card"><table class="dtable">
+          <thead><tr><th>Project</th><th>Product line</th><th>Submitted</th><th>Quote total</th><th>Status</th></tr></thead>
+          <tbody>
+            ${quoteOrderRow('Harbor View Estate','rf','Jul 12, 2026','wait')}
+            ${quoteOrderRow('Dawson Family — Kitchen & Pantry','ks','Jul 9, 2026','wait')}
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3 class="section-title">Recent orders</h3><button class="section-link" onclick="showToast('Full list — not built in this prototype')">View all</button></div>
+        <div class="card"><table class="dtable">
+          <thead><tr><th>Order</th><th>Product line</th><th>Placed</th><th>Order total</th><th>Status</th></tr></thead>
+          <tbody>
+            ${quoteOrderRow('Cedar Ridge, Unit 2','an','Jul 3, 2026','prod')}
+            ${quoteOrderRow('Lakeview Condo Vanity','rd','Jun 24, 2026','shipped')}
+          </tbody>
+        </table></div>
+      </div>
+
+    </div>
+
+    <div class="side-col">
+      <div class="card side-card">
+        <h3>Catalog quick access</h3>
+        <div class="catalog-grid">
+          ${catalogTile('ks','Keystone','Framed · Entry line')}
+          ${catalogTile('an','Anchor','Framed · Standard')}
+          ${catalogTile('rf','Ravir Frameless','Frameless · Premium')}
+          ${catalogTile('rd','Ravir Framed','Framed · Premium')}
+        </div>
+      </div>
+
+      <div class="card side-card">
+        <h3>Announcements</h3>
+        <div class="announcement"><div class="a-dot"></div><div><p class="a-title">Ravir Frameless fall finishes now available</p><p>Six new door colors added to the catalog.</p><p class="a-time">2 days ago</p></div></div>
+        <div class="announcement"><div class="a-dot"></div><div><p class="a-title">Keystone lead times extended to 4 weeks</p><p>Effective for orders placed after Aug 1.</p><p class="a-time">5 days ago</p></div></div>
+      </div>
+
+      <div class="card side-card">
+        <h3>Dealer messages</h3>
+        <div class="msg"><div class="m-avatar">JR</div><div class="m-body"><p class="m-name">Jill Ramos <span class="unread-dot"></span></p><p class="m-snippet">Can you confirm the vanity depth on...</p></div></div>
+        <div class="msg"><div class="m-avatar">TC</div><div class="m-body"><p class="m-name">Tom Chen</p><p class="m-snippet">Order #CB-10391 shipped today</p></div></div>
+      </div>
+    </div>
+  </div>`;
+}
+function pinCard(name, meta, line){
+  return `<div class="pin-card" onclick="loadProject('${name}')">
+    <div class="pin-accent ${line}"></div>
+    <button class="pin-flag" onclick="event.stopPropagation();togglePin(this)" title="Unpin"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--${line})" stroke="var(--${line})" stroke-width="1.5"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2L12 16.4 5.7 21l2.3-7.2-6-4.6h7.6z"/></svg></button>
+    <p class="pin-name">${name}</p><p class="pin-meta">${meta}</p>
+    <span class="line-tag ${line}"><span class="swatch"></span>${LINES[line].label}</span>
+  </div>`;
+}
+function togglePin(btn){ const c=btn.closest('.pin-card'); c.style.opacity='0.35'; setTimeout(()=>c.style.display='none',200); }
+function continueRow(name, room, line, edited){
+  const t = computeTotals(EXISTING[name].items, line);
+  return `<tr onclick="loadProject('${name}')">
+    <td><div class="cell-title">${name} — ${room}</div><div class="cell-sub">${t.qty} cabinets</div></td>
+    <td><span class="line-tag ${line}"><span class="swatch"></span>${LINES[line].label}</span></td>
+    <td>${edited}</td>
+    <td class="cell-price">${fmt(t.list)} <span class="net">net ${fmt(t.net)}</span></td>
+    <td><span class="status-pill progress">In progress</span></td>
+  </tr>`;
+}
+function quoteOrderRow(name, line, date, statusClass){
+  const t = computeTotals(EXISTING[name].items, line);
+  const labels = {wait:'Awaiting response', prod:'In production', shipped:'Shipped'};
+  return `<tr onclick="viewReadOnly('${name}')">
+    <td><div class="cell-title">${name}</div></td>
+    <td><span class="line-tag ${line}"><span class="swatch"></span>${LINES[line].label}</span></td>
+    <td>${date}</td>
+    <td class="cell-price">${fmt(t.list)} <span class="net">net ${fmt(t.net)}</span></td>
+    <td><span class="status-pill ${statusClass}">${labels[statusClass]}</span></td>
+  </tr>`;
+}
+function catalogTile(line, name, sub){
+  return `<button class="cat-tile" onclick="startNewProjectWithLine('${line}')"><div class="cat-tile-accent ${line}"></div><p class="ct-name">${name}</p><p class="ct-sub">${sub}</p></button>`;
+}
+function startNewProjectWithLine(line){
+  state.newProjectDraft = {name:'', roomType:'Kitchen', presetLine:line};
+  state.project = null; state.quoteItems = []; state.readOnly=false;
+  nav('newProject');
+}
+
+/* ================= Screen: New Project ================= */
+function renderNewProject(){
+  const rooms = ['Kitchen','Island','Pantry','Laundry','Bathroom','Office','Other'];
+  return `
+  ${pageHead('New project','Give this project a name and set up the first room.')}
+  <div class="form-card">
+    <label>Project name</label>
+    <input type="text" id="npName" placeholder="e.g. Whitmore Residence" value="${state.newProjectDraft.name}" oninput="state.newProjectDraft.name=this.value">
+    <label>First room</label>
+    <select id="npRoomType">${rooms.map(r=>'<option '+(state.newProjectDraft.roomType===r?'selected':'')+'>'+r+'</option>').join('')}</select>
+    <p class="form-hint">You can add more rooms to this project later.</p>
+    <button class="btn-primary" onclick="createProject()">Continue<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+  </div>`;
+}
+function createProject(){
+  const name = document.getElementById('npName').value.trim();
+  const roomType = document.getElementById('npRoomType').value;
+  if(!name){ showToast('Enter a project name to continue'); return; }
+  state.project = {name, room:roomType, line: state.newProjectDraft.presetLine || null};
+  state.quoteItems = [];
+  if(state.project.line){ state.activeCategory=CATEGORIES[0]; nav('category'); }
+  else nav('selectLine');
+}
+
+/* ================= Screen: Select Line ================= */
+function renderSelectLine(){
+  return `
+  ${breadcrumb()}
+  ${pageHead('Select a product line','This decision sets everything downstream — sizes, colors, and pricing.')}
+  <div class="line-grid">
+    ${lineCard('ks')}${lineCard('an')}${lineCard('rf')}${lineCard('rd')}
+  </div>`;
+}
+function lineCard(line){
+  const l = LINES[line];
+  return `<button class="line-card" onclick="chooseLine('${line}')">
+    <div class="lc-band ${line}"></div>
+    <div class="lc-body"><p class="lc-name">${l.label}</p><p class="lc-desc">${l.desc}</p><span class="lc-cta">Browse ${l.label} →</span></div>
+  </button>`;
+}
+function chooseLine(line){ state.project.line=line; state.activeCategory=CATEGORIES[0]; nav('category'); }
+
+/* ================= Screen: Category ================= */
+function catalogItemMatches(c, q){
+  if(!q) return true;
+  const hay = (c.id+' '+c.name).toLowerCase();
+  return hay.includes(q.toLowerCase());
+}
+function renderCategory(){
+  const line = state.project.line;
+  const allInCat = CATALOG.filter(c=>c.category===state.activeCategory && isBrowsable(c));
+  const items = allInCat.filter(c=>catalogItemMatches(c, state.categoryFilter));
+  const viewQuoteBtn = '<button class="btn-secondary" onclick="nav(\'quoteBuilder\')">View quote (' + state.quoteItems.length + ')</button>';
+  return `
+  ${breadcrumb()}
+  ${pageHead('Choose a cabinet','Only options for '+LINES[line].label+' are shown as available.', viewQuoteBtn)}
+  <div class="cat-tabs-wrap">
+    <div class="cat-tabs">${CATEGORIES.map(c=>'<button class="cat-tab '+(c===state.activeCategory?'active':'')+'" onclick="setCategory(\''+c+'\')">'+c+' <span class="cat-tab-count">'+CATALOG.filter(x=>x.category===c && isBrowsable(x)).length+'</span></button>').join('')}</div>
+    <input class="cat-search" type="text" placeholder="Filter ${allInCat.length} ${state.activeCategory.toLowerCase()}… (name or code)" value="${state.categoryFilter||''}" oninput="filterCategory(this.value)">
+  </div>
+  <div class="cab-grid">${items.length ? items.map(c=>cabCard(c,line)).join('') : '<p class="empty-hint">No matches for "'+(state.categoryFilter||'')+'" in '+state.activeCategory+'.</p>'}</div>`;
+}
+function setCategory(c){ state.activeCategory=c; state.categoryFilter=''; nav('category'); }
+function filterCategory(val){
+  state.categoryFilter = val;
+  const line = state.project.line;
+  const items = CATALOG.filter(c=>c.category===state.activeCategory && isBrowsable(c) && catalogItemMatches(c, val));
+  const grid = document.querySelector('.cab-grid');
+  if(grid) grid.innerHTML = items.length ? items.map(c=>cabCard(c,line)).join('') : '<p class="empty-hint">No matches for "'+val+'" in '+state.activeCategory+'.</p>';
+}
+function cabCard(c, line){
+  const ok = c.lines.includes(line);
+  const color = ok?('var(--'+line+')'):'var(--ink-muted)';
+  const wRange = c.widths.length>1 ? (c.widths[0]+'–'+c.widths[c.widths.length-1]+'"') : (c.widths[0]+'"');
+  return `<div class="cab-card ${ok?'available':'unavailable'}" ${ok?('onclick="openDetail(\''+c.id+'\')"'):''}>
+    <div class="cab-thumb" style="background:${ok?'var(--'+line+'-bg)':'var(--surface-1)'}">
+      ${cabPhotoHTML(c, color, 38)}
+    </div>
+    <div class="cab-body">
+      <p class="cab-name">${c.name}</p>
+      <p class="cab-code">${c.id} · ${wRange}</p>
+      ${ok ? '<span class="cab-avail-badge" style="background:var(--'+line+'-bg);color:var(--'+line+'-tx)">Available</span>' : '<span class="cab-avail-badge">Not available in '+LINES[line].label+'</span>'}
+    </div>
+  </div>`;
+}
+
+/* ================= Screen: Cabinet Detail ================= */
+function openDetail(cabId){
+  const line = state.project.line;
+  state.detailItem = defaultItemConfig(cabId, line);
+  nav('cabinetDetail');
+}
+function setDetail(field, value){ state.detailItem[field]=value; render(); }
+function setDetailMod(field, value){ state.detailItem.mods[field]=value; render(); }
+function adjustDetailQty(delta){ state.detailItem.qty = Math.max(1, state.detailItem.qty+delta); render(); }
+function adjustRollout(delta){ state.detailItem.mods.rolloutQty = Math.max(0, state.detailItem.mods.rolloutQty+delta); render(); }
+
+function optionList(arr, selectedId, labelKey){
+  return arr.map(o=>'<option value="'+o.id+'" '+(o.id===selectedId?'selected':'')+'>'+o[labelKey||'label']+'</option>').join('');
+}
+function renderBreakdown(pb, qty){
+  const rows = pb.breakdown.map(r=>'<div class="breakdown-line"><span>'+r.label+'</span><span>'+fmt(r.amount)+'</span></div>').join('');
+  return '<div class="breakdown">'+rows+
+    '<div class="breakdown-line total"><span>List total (× '+qty+')</span><span>'+fmt(pb.listUnit*qty)+'</span></div>'+
+    '<div class="breakdown-line net"><span>Dealer net (× '+qty+')</span><span>'+fmt(pb.netUnit*qty)+'</span></div>'+
+  '</div>';
+}
+function renderCabinetDetail(){
+  const line = state.project.line;
+  const item = state.detailItem;
+  const c = cab(item.cabId);
+  const pb = priceBreakdown(item, line);
+  const code = codeFor(item, line);
+  const hasDrawers = c.drawers.length>0;
+  const hasHeight = !!c.heights;
+  const isBase = c.category==='Base Cabinets' || c.category==='Base Corners';
+
+  let html = '';
+  html += breadcrumb();
+  html += '<button class="btn-ghost" onclick="nav(\'category\')">‹ Back to '+state.activeCategory+'</button>';
+  html += '<div class="detail-layout" style="margin-top:14px;">';
+  html += '<div><div class="detail-image" style="background:var(--'+line+'-bg)">'+cabPhotoHTML(c,'var(--'+line+')',84,'cab-photo-lg')+'</div>';
+  html += '<p class="dp-name">'+c.name+'</p><div class="dp-code">'+code+'</div></div>';
+
+  html += '<div class="detail-panel">';
+
+  html += '<div class="config-card"><h4>Size</h4><div class="config-row">';
+  html += '<div class="config-field"><label>Width (1/16")</label><input type="number" step="0.0625" min="'+c.widths[0]+'" max="'+c.widths[c.widths.length-1]+'" value="'+item.width+'" onchange="setDetail(\'width\',Math.min('+c.widths[c.widths.length-1]+',Math.max('+c.widths[0]+',Math.round((parseFloat(this.value)||'+c.widths[0]+')*16)/16)))"><div class="field-hint">'+fmtWidth(item.width)+' · range '+c.widths[0]+'"–'+c.widths[c.widths.length-1]+'"</div></div>';
+  if(isBase){
+    const bh0=28, bh1=48, bd0=9, bd1=30;
+    const curH = itemDims(item).height, curD = itemDims(item).depth;
+    html += '<div class="config-field"><label>Height (in)</label><input type="number" step="0.0625" min="'+bh0+'" max="'+bh1+'" value="'+curH+'" onchange="setDetail(\'height\',Math.min('+bh1+',Math.max('+bh0+',Math.round((parseFloat(this.value)||'+bh0+')*16)/16)))"><div class="field-hint">'+fmtWidth(curH)+' · range '+bh0+'"–'+bh1+'"</div></div>';
+    html += '<div class="config-field"><label>Depth (in)</label><input type="number" step="0.0625" min="'+bd0+'" max="'+bd1+'" value="'+curD+'" onchange="setDetail(\'depth\',Math.min('+bd1+',Math.max('+bd0+',Math.round((parseFloat(this.value)||'+bd0+')*16)/16)))"><div class="field-hint">'+fmtWidth(curD)+' · range '+bd0+'"–'+bd1+'"</div></div>';
+  } else if(hasHeight) html += '<div class="config-field"><label>Height</label><select onchange="setDetail(\'height\',parseInt(this.value))">'+c.heights.map(h=>'<option value="'+h+'" '+(h===item.height?'selected':'')+'>'+h+'"</option>').join('')+'</select></div>';
+  html += '</div></div>';
+
+  html += '<div class="config-card"><h4>Construction</h4><div class="config-row">';
+  html += '<div class="config-field"><label>Door style / frame bead</label><select onchange="setDetail(\'doorStyle\',this.value)">'+optionList(DOOR_STYLES,item.doorStyle)+'</select></div>';
+  html += '<div class="config-field"><label>Panel profile</label><select onchange="setDetail(\'panel\',this.value)">'+optionList(PANELS,item.panel)+'</select></div>';
+  html += '<div class="config-field"><label>Wood species</label><select onchange="setDetail(\'species\',this.value)">'+optionList(SPECIES,item.species)+'</select></div>';
+  if(hasDrawers) html += '<div class="config-field"><label>Drawer box</label><select onchange="setDetail(\'drawerBoxMaterial\',this.value)"><option value="poplar" '+(item.drawerBoxMaterial==='poplar'?'selected':'')+'>Poplar</option><option value="plywood" '+(item.drawerBoxMaterial==='plywood'?'selected':'')+'>Plywood (−5%)</option></select></div>';
+  html += '</div></div>';
+
+  html += '<div class="config-card"><h4>Finish</h4><div class="config-row">';
+  html += '<div class="config-field"><label>Color</label><select onchange="setDetail(\'finish\',this.value)">'+optionList(FINISH_COLORS,item.finish)+'</select></div>';
+  html += '<div class="config-field"><label>Sheen</label><select onchange="setDetail(\'sheen\',this.value)">'+optionList(SHEENS,item.sheen)+'</select></div>';
+  html += '</div></div>';
+
+  html += '<div class="config-card"><h4>Modifications</h4><div class="mod-grid">';
+  if(!c.accessory){
+    html += '<label class="check-row"><input type="checkbox" '+(item.mods.finishedLeft?'checked':'')+' onchange="setDetailMod(\'finishedLeft\',this.checked)"> Finished left side</label>';
+    html += '<label class="check-row"><input type="checkbox" '+(item.mods.finishedRight?'checked':'')+' onchange="setDetailMod(\'finishedRight\',this.checked)"> Finished right side</label>';
+    html += '<label class="check-row"><input type="checkbox" '+(item.mods.applianceSide?'checked':'')+' onchange="setDetailMod(\'applianceSide\',this.checked)"> Appliance side</label>';
+  }
+  html += '</div>';
+  if(!c.accessory){
+    html += '<div class="config-row" style="margin-top:10px;">';
+    html += '<div class="config-field"><label>Toe kick</label><select onchange="setDetailMod(\'toeKick\',this.value)">'+optionList(TOE_KICK,item.mods.toeKick)+'</select></div>';
+    if(hasDrawers){
+      html += '<div class="config-field"><label>Interior insert</label><select onchange="setDetailMod(\'insert\',this.value)">'+optionList(INSERTS,item.mods.insert)+'</select></div>';
+      html += '<div class="config-field"><label>Drawer box logo</label><select onchange="setDetailMod(\'drawerLogo\',this.value)"><option value="none" '+(item.mods.drawerLogo==='none'?'selected':'')+'>None</option><option value="top" '+(item.mods.drawerLogo==='top'?'selected':'')+'>Top drawer</option><option value="all" '+(item.mods.drawerLogo==='all'?'selected':'')+'>All drawers</option></select></div>';
+    }
+    html += '</div>';
+    if(isBase){
+      html += '<div style="margin-top:12px;"><label style="display:block;font-size:11.5px;font-weight:700;color:var(--ink-secondary);margin-bottom:6px;">4" Roll-outs</label>';
+      html += '<div class="qty-stepper"><button onclick="adjustRollout(-1)">−</button><span>'+item.mods.rolloutQty+'</span><button onclick="adjustRollout(1)">+</button></div></div>';
+    }
+  }
+  html += '<div class="config-row" style="margin-top:12px;">';
+  html += '<div class="config-field"><label>Custom mod (%)</label><input type="number" min="0" max="100" value="'+item.mods.customModPct+'" onchange="setDetailMod(\'customModPct\',parseFloat(this.value)||0)"></div>';
+  html += '<div class="config-field" style="grid-column:span 2;"><label>Custom mod description</label><input type="text" value="'+item.mods.customModDesc+'" placeholder="Describe the modification" oninput="state.detailItem.mods.customModDesc=this.value"></div>';
+  html += '</div></div>';
+
+  html += '<div style="margin-top:16px;"><label style="display:block;font-size:11.5px;font-weight:700;color:var(--ink-secondary);margin-bottom:6px;">Quantity</label>';
+  html += '<div class="qty-stepper"><button onclick="adjustDetailQty(-1)">−</button><span>'+item.qty+'</span><button onclick="adjustDetailQty(1)">+</button></div></div>';
+
+  html += '<div class="dp-price"><span class="list">'+fmt(pb.listUnit*item.qty)+'</span><span class="net">net '+fmt(pb.netUnit*item.qty)+'</span></div>';
+  html += renderBreakdown(pb, item.qty);
+  html += '<button class="btn-primary" style="margin-top:16px;" onclick="addToQuote()">Add to quote</button>';
+
+  html += '</div></div>';
+  return html;
+}
+function addToQuote(){
+  state.quoteItems.push(JSON.parse(JSON.stringify(state.detailItem)));
+  showToast('Added to quote');
+  nav('category');
+}
+
+/* ================= Screen: Quote Builder ================= */
+function renderQuoteBuilder(){
+  const line = state.project.line;
+  const t = computeTotals(state.quoteItems, line);
+  return `
+  ${breadcrumb()}
+  ${pageHead('Quote builder','Everything you\'ve added for '+state.project.room+'.')}
+  <div class="card">
+    <table class="dtable">
+      <thead><tr><th>Cabinet</th><th>Code</th><th>Qty</th><th>List</th><th>Net</th><th></th></tr></thead>
+      <tbody>
+        ${state.quoteItems.length ? state.quoteItems.map((it,i)=>quoteRow(it,i,line)).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--ink-muted);padding:30px;">No cabinets added yet.</td></tr>'}
+      </tbody>
+    </table>
+    <div class="totals-bar">
+      <div class="t-block"><div class="t-label">Cabinets</div><div class="t-val">${t.qty}</div></div>
+      <div class="t-block"><div class="t-label">List total</div><div class="t-val">${fmt(t.list)}</div></div>
+      <div class="t-block"><div class="t-label">Net total</div><div class="t-val">${fmt(t.net)}</div></div>
+    </div>
+  </div>
+  <div class="action-row">
+    <button class="btn-secondary" onclick="nav('category')">+ Add more cabinets</button>
+    <button class="btn-secondary" onclick="addRoom()">+ Add another room</button>
+    <button class="btn-primary" ${state.quoteItems.length? '' : 'disabled'} onclick="nav('quoteReview')">Review quote</button>
+  </div>`;
+}
+function quoteRow(it, i, line){
+  const c = cab(it.cabId); const pb = priceBreakdown(it, line);
+  return `<tr>
+    <td><div class="cell-title">${c.name}</div><div class="cell-sub">${fmtWidth(it.width)}${it.height?(' × '+it.height+'"'):''}</div></td>
+    <td class="cell-sub">${codeFor(it,line)}</td>
+    <td><div class="qty-mini"><button onclick="changeQty(${i},-1)">−</button><span>${it.qty}</span><button onclick="changeQty(${i},1)">+</button></div></td>
+    <td class="cell-price">${fmt(pb.listUnit*it.qty)}</td>
+    <td class="cell-price">${fmt(pb.netUnit*it.qty)}</td>
+    <td><button class="btn-danger-ghost" onclick="removeItem(${i})">Remove</button></td>
+  </tr>`;
+}
+function changeQty(i, delta){ state.quoteItems[i].qty = Math.max(1, state.quoteItems[i].qty+delta); render(); }
+function removeItem(i){ state.quoteItems.splice(i,1); render(); }
+function addRoom(){
+  const name = window.prompt('Name this room (e.g. Pantry, Laundry, Bathroom)');
+  if(name && name.trim()){ state.project.room = state.project.room+' + '+name.trim(); }
+  nav('category');
+}
+
+/* ================= Screen: Quote Review ================= */
+function renderQuoteReview(){
+  const line = state.project.line;
+  const t = computeTotals(state.quoteItems, line);
+  const readOnlyBanner = state.readOnly ? '<div class="card" style="padding:14px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;color:var(--ink-secondary);">This quote has already been submitted.</span><span class="status-pill wait">'+(state.reviewStatus||'')+'</span></div>' : '';
+  const readOnlyActions = '<button class="btn-secondary" onclick="nav(\'dashboard\')">Back to dashboard</button>';
+  const editActions = '<button class="btn-ghost" onclick="nav(\'quoteBuilder\')">‹ Back to edit</button><button class="btn-secondary" onclick="requestQuote()">Request quote</button><button class="btn-primary" onclick="submitOrder()">Submit order</button>';
+  return `
+  ${breadcrumb()}
+  ${pageHead('Quote review', state.readOnly ? 'Read-only summary.' : 'Confirm the details before you send this to Cabredo.')}
+  ${readOnlyBanner}
+  <div class="card" style="padding:20px 24px;margin-bottom:20px;">
+    <div style="display:flex;gap:40px;flex-wrap:wrap;">
+      <div><div class="cell-sub">Dealer</div><div class="cell-title">Kitchen Designs LLC</div></div>
+      <div><div class="cell-sub">Project</div><div class="cell-title">${state.project.name}</div></div>
+      <div><div class="cell-sub">Room</div><div class="cell-title">${state.project.room}</div></div>
+      <div><div class="cell-sub">Product line</div><span class="line-tag ${line}"><span class="swatch"></span>${LINES[line].label}</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <table class="dtable">
+      <thead><tr><th>Cabinet</th><th>Code</th><th>Qty</th><th>List</th><th>Net</th></tr></thead>
+      <tbody>${state.quoteItems.map(it=>reviewRow(it,line)).join('')}</tbody>
+    </table>
+    <div class="totals-bar">
+      <div class="t-block"><div class="t-label">Cabinets</div><div class="t-val">${t.qty}</div></div>
+      <div class="t-block"><div class="t-label">List total</div><div class="t-val">${fmt(t.list)}</div></div>
+      <div class="t-block"><div class="t-label">Net total</div><div class="t-val">${fmt(t.net)}</div></div>
+    </div>
+  </div>
+  <div class="action-row">${state.readOnly ? readOnlyActions : editActions}</div>`;
+}
+function reviewRow(it, line){
+  const c = cab(it.cabId); const pb = priceBreakdown(it, line);
+  return '<tr><td><div class="cell-title">'+c.name+'</div><div class="cell-sub">'+fmtWidth(it.width)+(it.height?(' × '+it.height+'"'):'')+'</div></td><td class="cell-sub">'+codeFor(it,line)+'</td><td>'+it.qty+'</td><td class="cell-price">'+fmt(pb.listUnit*it.qty)+'</td><td class="cell-price">'+fmt(pb.netUnit*it.qty)+'</td></tr>';
+}
+function requestQuote(){ nav('submitted', {submitMode:'quote'}); }
+function submitOrder(){ nav('submitted', {submitMode:'order'}); }
+
+/* ================= Screen: Submitted ================= */
+function renderSubmitted(){
+  const isOrder = state.submitMode==='order';
+  const ref = (isOrder?'CB-1':'Q-2') + Math.floor(10000+Math.random()*89999);
+  return `<div class="confirm-wrap">
+    <div class="confirm-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--an-tx)" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <h1>${isOrder ? 'Order submitted' : 'Quote requested'}</h1>
+    <p>${state.project.name} — ${state.project.room}</p>
+    <p>${isOrder ? 'Cabredo will begin processing this order.' : 'Your Cabredo rep will follow up shortly.'}</p>
+    <div class="confirm-ref">${ref}</div>
+    <div class="action-row" style="justify-content:center;">
+      <button class="btn-primary" onclick="nav('dashboard')">Back to dashboard</button>
+      <button class="btn-secondary" onclick="startNewProject()">Start another project</button>
+    </div>
+  </div>`;
+}
+
+/* ================= Initialization ================= */
+render();
+</script>
+</body>
+</html>
